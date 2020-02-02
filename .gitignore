@@ -93,3 +93,6 @@ ENV/
 
 # Flask
 flask_session/
+
+# SQLite databases
+*.sqlite
