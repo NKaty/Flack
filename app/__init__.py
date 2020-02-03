@@ -21,4 +21,7 @@ def create_app(config_name):
     session.init_app(app)
     socketio.init_app(app, manage_session=False)
 
+    from .main import main as main_blueprint
+    app.register_blueprint(main_blueprint)
+
     return app
