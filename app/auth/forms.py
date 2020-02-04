@@ -21,12 +21,10 @@ class SignupForm(FlaskForm):
     password2 = PasswordField('Confirm password', validators=[DataRequired()])
     submit = SubmitField('Sign Up')
 
-    @staticmethod
-    def validate_email(field):
+    def validate_email(self, field):
         if User.query.filter_by(email=field.data.lower()).first():
             raise ValidationError('Email already registered.')
 
-    @staticmethod
-    def validate_username(field):
+    def validate_username(self, field):
         if User.query.filter_by(username=field.data).first():
             raise ValidationError('Username already is already taken.')
