@@ -13,6 +13,8 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), nullable=False, unique=True)
     password_hash = db.Column(db.String(128), nullable=False)
     last_seen = db.Column(db.DateTime(), nullable=False, default=datetime.utcnow)
+    channel_id = db.Column(db.Integer, db.ForeignKey('channels.id'))
+    messages = db.relationship('Message', backref='author', lazy='dynamic')
 
     @property
     def password(self):
@@ -32,3 +34,20 @@ class User(UserMixin, db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+class Channel(db.Model):
+    __tablename__ = 'channels'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), nullable=False, unique=True)
+    users = db.relationship('User', backref='current_channel', lazy='dynamic')
+    messages = db.relationship('Message', backref='channel', lazy='dynamic')
+
+
+class Message(db.Model):
+    __tablename__ = 'messages'
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, index=True, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    channel_id = db.Column(db.Integer, db.ForeignKey('channels.id'), nullable=False)
