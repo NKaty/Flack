@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from flask_migrate import Migrate
 
 from app import create_app, db, socketio
-from app.models import User
+from app.models import User, Channel, Message
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 if os.path.exists(dotenv_path):
@@ -16,7 +16,7 @@ migrate = Migrate(app, db, render_as_batch=True)
 
 @app.shell_context_processor
 def make_shell_context():
-    return dict(db=db, User=User)
+    return dict(db=db, User=User, Channel=Channel, Message=Message)
 
 
 if __name__ == '__main__':

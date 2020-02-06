@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Channels - Chat{% endblock %}
+
+{% block page_content %}
+<h2>{{ chats.username }}</h2>
+<div class="row">
+    <div class="col-3">
+        <h3>Channels</h3>
+        <ul id="channels">
+            {% if chats.channels %}
+            {% for channel in chats.channels %}
+            <li>{{ channel.name }}</li>
+            {% endfor %}
+            {% endif %}
+        </ul>
+    </div>
+    <div class="col-6">
+        <ul id="messages">
+            {% if chats.messages %}
+            {% for message in chats.messages %}
+            <li>{{ message.text }}</li>
+            {% endfor %}
+            {% endif %}
+        </ul>
+        <input type="text">
+    </div>
+    <div class="col-3">
+        <h3>Members</h3>
+        <ul id="members">
+            {% if chats.members %}
+            {% for member in chats.members %}
+            <li>{{ member.username }}</li>
+            {% endfor %}
+            {% endif %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

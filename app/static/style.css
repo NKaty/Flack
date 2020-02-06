@@ -1,3 +1,3 @@
-.invalid-feedback {
+:not[type="hidden"] > .invalid-feedback {
     display: block;
 }
