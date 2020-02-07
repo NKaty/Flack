@@ -3,14 +3,14 @@
 {% block title %}Channels - Chat{% endblock %}
 
 {% block page_content %}
-<h2>{{ chats.username }}</h2>
+<h2>{{ chats.user.username }}</h2>
 <div class="row">
     <div class="col-3">
         <h3>Channels</h3>
         <ul id="channels">
             {% if chats.channels %}
             {% for channel in chats.channels %}
-            <li>{{ channel.name }}</li>
+            <li class="{{ 'active' if chats.user.current_channel.name == channel.name }}" data-channel="{{ channel.name }}">{{ channel.name }}</li>
             {% endfor %}
             {% endif %}
         </ul>
@@ -23,7 +23,8 @@
             {% endfor %}
             {% endif %}
         </ul>
-        <input type="text">
+        <input id="message" type="text">
+        <button id="send">Send</button>
     </div>
     <div class="col-3">
         <h3>Members</h3>
@@ -36,4 +37,10 @@
         </ul>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+<script src="{{ url_for('static', filename='sockets.js') }}"></script>
 {% endblock %}

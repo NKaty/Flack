@@ -1,3 +1,7 @@
 :not[type="hidden"] > .invalid-feedback {
-    display: block;
+  display: block;
+}
+
+.active {
+  color: blue;
 }
