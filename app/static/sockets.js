@@ -11,7 +11,7 @@ $(function () {
       $(this).addClass('active').siblings().removeClass('active');
     });
 
-    $('#send').on('click', function () {
+    $('#messages').on('click', '#send', function () {
       const inp = $('#message').val();
       if (inp.length > 0) {
         socket.emit('send message', inp);
@@ -20,11 +20,62 @@ $(function () {
     });
   });
 
-  socket.on('set active channel', channel => activeChannel = channel);
+  socket.on('set active channel', channel => {
+    activeChannel = channel;
+    socket.emit('joined', activeChannel);
+  });
 
   socket.on('update message', message => {
-    const item = document.createElement('li');
-    item.innerHTML = message.author + ' ' + message.msg + ' ' + message.timestamp + '\n';
-    $('#messages').append(item)
+    $('#msg').append($(`
+      <div>
+      <span>${message.author}</span>
+      <span>${message.timestamp}</span>
+      <div>${message.text}</div>
+      </div>
+      `));
   });
+
+  socket.on('load channel', channelInfo => {
+    loadMessages(channelInfo.messages);
+    loadMembers(channelInfo.members);
+  });
+
+  socket.on('load channels', channels => loadChannels(channels));
+
+  function loadMessages (messages) {
+    $('#messages').html('').append(messages.reduce((acc, item) => {
+      acc.append($(`
+      <div>
+      <span>${item.author}</span>
+      <span>${item.timestamp}</span>
+      <div>${item.text}</div>
+      </div>
+      `));
+      return acc;
+    }, $('<div id="msg"></div>')));
+    $('#messages').append($(`
+    <input id="message" type="text">
+    <button id="send">Send</button>
+    `));
+  }
+
+  function loadMembers (members) {
+    $('#members').html('').append(members.reduce((acc, item) => {
+      acc.append($(`
+      <li>${item}</li>
+      `));
+      return acc;
+    }, $('<ul></ul>')));
+  }
+
+  function loadChannels (channels) {
+    $('#channels').html('').append(channels.reduce((acc, item) => {
+      acc.append($(`
+      <li${item === activeChannel
+        ? ' class=active'
+        : ''} data-channel=${item}>${item}</li>
+      `));
+      return acc;
+    }, $('<ul></ul>')));
+  }
 });

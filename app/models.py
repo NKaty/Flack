@@ -43,6 +43,19 @@ class Channel(db.Model):
     users = db.relationship('User', backref='current_channel', lazy='dynamic')
     messages = db.relationship('Message', backref='channel', lazy='dynamic')
 
+    def get_all_channel_messages(self):
+        messages = self.messages.order_by(Message.timestamp.asc()).all()
+        return [message.to_json() for message in messages]
+
+    def get_all_channel_members(self):
+        members = self.users.order_by(User.username.asc()).all()
+        return [member.username for member in members]
+
+    @staticmethod
+    def get_all_channels():
+        channels = Channel.query.order_by(Channel.name.asc()).all()
+        return [channel.name for channel in channels]
+
 
 class Message(db.Model):
     __tablename__ = 'messages'
@@ -51,3 +64,10 @@ class Message(db.Model):
     timestamp = db.Column(db.DateTime, nullable=False, index=True, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     channel_id = db.Column(db.Integer, db.ForeignKey('channels.id'), nullable=False)
+
+    def to_json(self):
+        return {
+            'text': self.text,
+            'author': self.author.username,
+            'timestamp': self.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        }
