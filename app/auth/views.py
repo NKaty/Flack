@@ -20,7 +20,7 @@ def signup():
         flash('Congratulations, you are now a registered user!', 'success')
         login_user(user)
         next_url = request.args.get('next')
-        if next_url is None or is_safe_url(next_url):
+        if next_url is None or not is_safe_url(next_url):
             next_url = url_for('main.index')
         return redirect(next_url)
     return render_template('auth/signup.html', form=form)
@@ -34,7 +34,7 @@ def login():
         if user is not None and user.verify_password(form.password.data):
             login_user(user, form.remember_me.data)
             next_url = request.args.get('next')
-            if next_url is None or is_safe_url(next_url):
+            if next_url is None or not is_safe_url(next_url):
                 next_url = url_for('main.index')
             return redirect(next_url)
         flash('Invalid password or email!', 'danger')

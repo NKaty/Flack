@@ -56,6 +56,9 @@ class Channel(db.Model):
         channels = Channel.query.order_by(Channel.name.asc()).all()
         return [channel.name for channel in channels]
 
+    def __repr__(self):
+        return f'<Channel {self.name}>'
+
 
 class Message(db.Model):
     __tablename__ = 'messages'
@@ -71,3 +74,6 @@ class Message(db.Model):
             'author': self.author.username,
             'timestamp': self.timestamp.strftime('%Y-%m-%d %H:%M:%S')
         }
+
+    def __repr__(self):
+        return f'<Message {self.text} channel {self.channel.name} author {self.author.username}>'
