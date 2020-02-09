@@ -19,6 +19,29 @@
         <div id="members"></div>
     </div>
 </div>
+
+<div class="modal fade" id="create-channel-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title">Create channel</h5>
+            </div>
+            <form name="create-channel">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" name="channel" placeholder="Channel name">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button  type="button" id="submit" class="btn btn-info" data-dismiss="modal" disabled>Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}

@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import render_template, flash
 from flask_login import login_required, current_user
 from flask_socketio import emit, join_room, leave_room
 
@@ -28,6 +28,7 @@ def connect():
 
 @socketio.on('left')
 def left(channel):
+    # check
     leave_room(channel)
 
 
@@ -35,6 +36,7 @@ def left(channel):
 def joined(channel):
     join_room(channel)
     if current_user.channel_id is None or current_user.current_channel.name != channel:
+        # check
         current_user.current_channel = Channel.query.filter_by(name=channel).first()
         db.session.add(current_user._get_current_object())
         db.session.commit()
@@ -51,3 +53,16 @@ def send_message(text):
         db.session.add(message)
         db.session.commit()
         emit('update message', message.to_json(), room=message.channel.name)
+
+
+@socketio.on('create channel')
+def create_channel(channel):
+    if Channel.query.filter_by(name=channel).first():
+        emit('flash', [{'message': 'Channel with this name already exists.', 'category': 'danger'}])
+    else:
+        new_channel = Channel(name=channel)
+        db.session.add(new_channel)
+        db.session.commit()
+        emit('load channels', Channel.get_all_channels())
+        emit('flash',
+             [{'message': 'Channel has been successfully created.', 'category': 'success'}])

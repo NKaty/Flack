@@ -18,6 +18,29 @@ $(function () {
         $('#message').val('');
       }
     });
+
+    $('#create-channel-modal').on('click', '#submit', function (event) {
+      const inp = $('input[name="channel"]').val();
+      if (inp.length > 0) {
+        socket.emit('create channel', inp);
+      }
+    });
+
+    $('#create-channel-modal').on('shown.bs.modal', function () {
+      const form = $(this).find('form[name="create-channel"]');
+      const channelName = $(form).find('input[name="channel"]');
+      const btn = $(form).find('#submit');
+      channelName.focus();
+      $(btn).prop('disabled', true);
+      channelName.on('keyup', function () {
+        $(btn).prop('disabled', channelName.val().length < 1);
+      });
+    });
+
+    $('.modal').on('hidden.bs.modal', function () {
+      $(this).find('#submit').prop('disabled', true);
+      $(this).find('form')[0].reset();
+    });
   });
 
   socket.on('set active channel', channel => {
@@ -41,6 +64,8 @@ $(function () {
   });
 
   socket.on('load channels', channels => loadChannels(channels));
+
+  socket.on('flash', messages => showFlashMessages(messages));
 
   function loadMessages (messages) {
     $('#messages').html('').append(messages.reduce((acc, item) => {
@@ -77,5 +102,21 @@ $(function () {
       `));
       return acc;
     }, $('<ul></ul>')));
+    $('#channels').append($(`
+    <button id='create-channel' data-toggle='modal' data-target='#create-channel-modal'>Create channel</button>
+    `));
+  }
+
+  function showFlashMessages (messages) {
+    messages.forEach(item => {
+      $('main').prepend($(`
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          ${item.message}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      `));
+    });
   }
 });
