@@ -1,4 +1,4 @@
-from flask import render_template, flash
+from flask import render_template, request
 from flask_login import login_required, current_user
 from flask_socketio import emit, join_room, leave_room
 
@@ -63,6 +63,6 @@ def create_channel(channel):
         new_channel = Channel(name=channel)
         db.session.add(new_channel)
         db.session.commit()
-        emit('load channels', Channel.get_all_channels())
+        emit('load channels', Channel.get_all_channels(), broadcast=True)
         emit('flash',
              [{'message': 'Channel has been successfully created.', 'category': 'success'}])

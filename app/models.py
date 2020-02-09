@@ -14,6 +14,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128), nullable=False)
     last_seen = db.Column(db.DateTime(), nullable=False, default=datetime.utcnow)
     channel_id = db.Column(db.Integer, db.ForeignKey('channels.id'))
+    is_connected = db.Column(db.Boolean, default=False, nullable=False)
     messages = db.relationship('Message', backref='author', lazy='dynamic')
 
     @property
