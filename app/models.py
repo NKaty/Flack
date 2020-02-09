@@ -49,7 +49,7 @@ class Channel(db.Model):
         return [message.to_json() for message in messages]
 
     def get_all_channel_members(self):
-        members = self.users.order_by(User.username.asc()).all()
+        members = self.users.filter_by(is_connected=True).order_by(User.username.asc()).all()
         return [member.username for member in members]
 
     @staticmethod

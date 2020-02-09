@@ -21,9 +21,23 @@ def channels():
 
 @socketio.on('connect')
 def connect():
+    current_user.is_connected = True
+    db.session.add(current_user._get_current_object())
+    db.session.commit()
     if current_user.channel_id is not None:
         emit('set active channel', current_user.current_channel.name)
+        emit('members changed', current_user.current_channel.get_all_channel_members(),
+             room=current_user.current_channel.name)
     emit('load channels', Channel.get_all_channels())
+
+
+@socketio.on('disconnect')
+def disconnect():
+    current_user.is_connected = False
+    db.session.add(current_user._get_current_object())
+    db.session.commit()
+    emit('members changed', current_user.current_channel.get_all_channel_members(),
+         room=current_user.current_channel.name)
 
 
 @socketio.on('left')
@@ -34,14 +48,20 @@ def left(channel):
 
 @socketio.on('joined')
 def joined(channel):
+    # check
     join_room(channel)
+    previous_channel = current_user.channel_id and current_user.current_channel.name
     if current_user.channel_id is None or current_user.current_channel.name != channel:
-        # check
         current_user.current_channel = Channel.query.filter_by(name=channel).first()
         db.session.add(current_user._get_current_object())
         db.session.commit()
-    emit('load channel', {'messages': current_user.current_channel.get_all_channel_messages(),
-                          'members': current_user.current_channel.get_all_channel_members()})
+    if previous_channel is not None and previous_channel != channel:
+        emit('members changed',
+             Channel.query.filter_by(name=previous_channel).first().get_all_channel_members(),
+             room=previous_channel)
+    emit('load messages', current_user.current_channel.get_all_channel_messages())
+    emit('members changed', current_user.current_channel.get_all_channel_members(),
+         room=current_user.current_channel.name)
 
 
 @socketio.on('send message')

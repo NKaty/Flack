@@ -58,12 +58,11 @@ $(function () {
       `));
   });
 
-  socket.on('load channel', channelInfo => {
-    loadMessages(channelInfo.messages);
-    loadMembers(channelInfo.members);
-  });
+  socket.on('load messages', messages => loadMessages(messages));
 
   socket.on('load channels', channels => loadChannels(channels));
+
+  socket.on('members changed', members => loadMembers(members));
 
   socket.on('flash', messages => showFlashMessages(messages));
 
