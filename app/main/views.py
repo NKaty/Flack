@@ -42,17 +42,19 @@ def disconnect():
 
 @socketio.on('left')
 def left(channel):
-    # check
     leave_room(channel)
 
 
 @socketio.on('joined')
 def joined(channel):
-    # check
+    new_channel = Channel.query.filter_by(name=channel).first()
+    if new_channel is None:
+        return emit('flash', [{'message': 'The channel you have tried to reach does not exist.',
+                               'category': 'danger'}])
     join_room(channel)
     previous_channel = current_user.channel_id and current_user.current_channel.name
     if current_user.channel_id is None or current_user.current_channel.name != channel:
-        current_user.current_channel = Channel.query.filter_by(name=channel).first()
+        current_user.current_channel = new_channel
         db.session.add(current_user._get_current_object())
         db.session.commit()
     if previous_channel is not None and previous_channel != channel:

@@ -1,114 +1,171 @@
 $(function () {
-  let activeChannel = null;
-  const socket = io.connect(
-    location.protocol + '//' + document.domain + ':' + location.port);
-  socket.on('connect', () => {
-    $('#channels').on('click', 'li', function () {
-      if ($(this).hasClass('active')) return;
-      socket.emit('left', activeChannel);
-      activeChannel = $(this).data('channel');
-      socket.emit('joined', activeChannel);
-      $(this).addClass('active').siblings().removeClass('active');
-    });
+  class Socket {
+    constructor (view) {
+      this.socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+      this.view = view;
+      this.activeChannel = null;
+      this.initialize();
+    }
 
-    $('#messages').on('click', '#send', function () {
-      const inp = $('#message').val();
-      if (inp.length > 0) {
-        socket.emit('send message', inp);
-        $('#message').val('');
-      }
-    });
+    initialize () {
+      this.socket.on('connect', () => this.onConnect());
+      this.socket.on('set active channel', channel => this.setActiveChanel(channel));
+      this.socket.on('update message', message => this.view.updateMessage(message));
+      this.socket.on('load messages', messages => this.view.loadMessages(messages));
+      this.socket.on('load channels', channels => this.view.loadChannels(channels, this.activeChannel));
+      this.socket.on('members changed', members => this.view.loadMembers(members));
+      this.socket.on('flash', messages => this.view.showFlashMessages(messages));
+    }
 
-    $('#create-channel-modal').on('click', '#submit', function (event) {
-      const inp = $('input[name="channel"]').val();
-      if (inp.length > 0) {
-        socket.emit('create channel', inp);
-      }
-    });
+    onConnect () {
+      this.initializeChannelChangeEvent();
+      this.initializeMessageSendEvent();
+      this.initializeChannelCreateEvent();
+      this.initializeChannelCreateValidationEvent();
+      this.initializeChannelCreateFormCloseEvent();
+    }
 
-    $('#create-channel-modal').on('shown.bs.modal', function () {
-      const form = $(this).find('form[name="create-channel"]');
-      const channelName = $(form).find('input[name="channel"]');
-      const btn = $(form).find('#submit');
-      channelName.focus();
-      $(btn).prop('disabled', true);
-      channelName.on('keyup', function () {
-        $(btn).prop('disabled', channelName.val().length < 1);
+    setActiveChanel (channel) {
+      this.activeChannel = channel;
+      this.socket.emit('joined', this.activeChannel);
+    }
+
+    initializeChannelChangeEvent () {
+      const self = this;
+      this.view.channels.on('click', 'li', function () {
+        if (self.view.isChannelActive(this)) return;
+        self.socket.emit('left', self.activeChannel);
+        self.activeChannel = self.view.getDataAttribute(this, 'channel');
+        self.socket.emit('joined', self.activeChannel);
+        self.view.setChannelActive(this);
       });
-    });
+    }
 
-    $('.modal').on('hidden.bs.modal', function () {
-      $(this).find('#submit').prop('disabled', true);
-      $(this).find('form')[0].reset();
-    });
-  });
+    initializeMessageSendEvent () {
+      this.view.messages.on('click', this.view.send, () => {
+        const message = $(this.view.messageInput).val();
+        if (message.length > 0) {
+          this.socket.emit('send message', message);
+          $(this.view.messageInput).val('');
+        }
+      });
+    }
 
-  socket.on('set active channel', channel => {
-    activeChannel = channel;
-    socket.emit('joined', activeChannel);
-  });
+    initializeChannelCreateEvent () {
+      this.view.createChannel.on('click', this.view.submit, () => {
+        const channel = this.view.channelInput.val();
+        if (channel.length > 0) {
+          this.socket.emit('create channel', channel);
+        }
+      });
+    }
 
-  socket.on('update message', message => {
-    $('#msg').append($(`
+    initializeChannelCreateValidationEvent () {
+      this.view.channelCreateValidation();
+    }
+
+    initializeChannelCreateFormCloseEvent () {
+      this.view.channelCreateFormClose();
+    }
+  }
+
+  class View {
+    constructor () {
+      this.channels = $('#channels');
+      this.messages = $('#messages');
+      this.members = $('#members');
+      this.createChannel = $('#create-channel-modal');
+      this.channelInput = $('input[name="channel"]');
+      this.messageInput = '#message';
+      this.send = '#send';
+      this.submit = '#submit';
+    }
+
+    isChannelActive (channel) {
+      return $(channel).hasClass('active');
+    }
+
+    setChannelActive (channel) {
+      $(channel).addClass('active').siblings().removeClass('active');
+    }
+
+    getDataAttribute (elem, attr) {
+      return $(elem).data(attr);
+    }
+
+    channelCreateValidation () {
+      this.createChannel.on('shown.bs.modal', function () {
+        const form = $(this).find('form[name="create-channel"]');
+        const channelName = $(form).find('input[name="channel"]');
+        const btn = $(form).find('#submit');
+        channelName.focus();
+        $(btn).prop('disabled', true);
+        channelName.on('keyup', function () {
+          $(btn).prop('disabled', channelName.val().length < 1);
+        });
+      });
+    }
+
+    channelCreateFormClose () {
+      this.createChannel.on('hidden.bs.modal', function () {
+        $(this).find('#submit').prop('disabled', true);
+        $(this).find('form')[0].reset();
+      });
+    }
+
+    updateMessage (message) {
+      $('#msg').append($(`
       <div>
       <span>${message.author}</span>
       <span>${message.timestamp}</span>
       <div>${message.text}</div>
       </div>
       `));
-  });
+    }
 
-  socket.on('load messages', messages => loadMessages(messages));
-
-  socket.on('load channels', channels => loadChannels(channels));
-
-  socket.on('members changed', members => loadMembers(members));
-
-  socket.on('flash', messages => showFlashMessages(messages));
-
-  function loadMessages (messages) {
-    $('#messages').html('').append(messages.reduce((acc, item) => {
-      acc.append($(`
+    loadMessages (messages) {
+      this.messages.html('').append(messages.reduce((acc, item) => {
+        acc.append($(`
       <div>
       <span>${item.author}</span>
       <span>${item.timestamp}</span>
       <div>${item.text}</div>
       </div>
       `));
-      return acc;
-    }, $('<div id="msg"></div>')));
-    $('#messages').append($(`
+        return acc;
+      }, $('<div id="msg"></div>')));
+      this.messages.append($(`
     <input id="message" type="text">
     <button id="send">Send</button>
     `));
-  }
+    }
 
-  function loadMembers (members) {
-    $('#members').html('').append(members.reduce((acc, item) => {
-      acc.append($(`
+    loadMembers (members) {
+      this.members.html('').append(members.reduce((acc, item) => {
+        acc.append($(`
       <li>${item}</li>
       `));
-      return acc;
-    }, $('<ul></ul>')));
-  }
+        return acc;
+      }, $('<ul></ul>')));
+    }
 
-  function loadChannels (channels) {
-    $('#channels').html('').append(channels.reduce((acc, item) => {
-      acc.append($(`
+    loadChannels (channels, activeChannel) {
+      this.channels.html('').append(channels.reduce((acc, item) => {
+        acc.append($(`
       <li${item === activeChannel
-        ? ' class=active'
-        : ''} data-channel=${item}>${item}</li>
+          ? ' class=active'
+          : ''} data-channel=${item}>${item}</li>
       `));
-      return acc;
-    }, $('<ul></ul>')));
-    $('#channels').append($(`
+        return acc;
+      }, $('<ul></ul>')));
+      this.channels.append($(`
     <button id='create-channel' data-toggle='modal' data-target='#create-channel-modal'>Create channel</button>
     `));
-  }
+    }
 
-  function showFlashMessages (messages) {
-    messages.forEach(item => {
-      $('main').prepend($(`
+    showFlashMessages (messages) {
+      messages.forEach(item => {
+        $('main').prepend($(`
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
           ${item.message}
           <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -116,6 +173,10 @@ $(function () {
           </button>
         </div>
       `));
-    });
+      });
+    }
   }
+
+  const view = new View();
+  const socket = new Socket(view);
 });
