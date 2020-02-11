@@ -3,15 +3,25 @@
 {% block title %}Channels - Chat{% endblock %}
 
 {% block page_content %}
-<h2>{{ user }}</h2>
+<h2>{{ user.username }}</h2>
 <div class="row">
     <div class="col-3">
         <h3>Channels</h3>
         <div id="channels"></div>
     </div>
     <div class="col-6">
-        <div id="messages">
-            Select channel or create your own channel to start messaging
+        <div id="messages-area">
+            <div id="messages">
+                {% if not user.channel_id %}
+                <p>Select channel or create your own channel to start messaging</p>
+                {% endif %}
+            </div>
+            <form class="form-inline {{ 'd-none' if not user.channel_id }}" id="send-message">
+                <div class="form-group mx-sm-3 mb-2">
+                    <textarea name="message" class="form-control"></textarea>
+                </div>
+                <button type="button" class="btn btn-primary mb-2">Send</button>
+            </form>
         </div>
     </div>
     <div class="col-3">
@@ -35,17 +45,68 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button  type="button" id="submit" class="btn btn-info" data-dismiss="modal" disabled>Submit</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close
+                    </button>
+                    <button type="button" id="submit" class="btn btn-info" data-dismiss="modal"
+                            disabled>Submit
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+{% raw %}
+
+<script id="flash-template" type="text/x-handlebars-template">
+    {{#each .}}
+    <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+        {{message}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {{/each}}
+</script>
+
+<script id="channels-template" type="text/x-handlebars-template">
+    <button id="create-channel" data-toggle="modal" data-target="#create-channel-modal">
+        Create channel
+    </button>
+    <ul>
+        {{#each channels}}
+        <li class="{{#if_eq this ../activeChannel}}active{{/if_eq}}" data-channel="{{this}}">
+            {{this}}
+        </li>
+        {{/each}}
+    </ul>
+</script>
+
+<script id="members-template" type="text/x-handlebars-template">
+    <ul>
+        {{#each .}}
+        <li>{{this}}</li>
+        {{/each}}
+    </ul>
+</script>
+
+<script id="messages-template" type="text/x-handlebars-template">
+    {{#each .}}
+    <div id="message">
+        <span>{{author}}</span>
+        <span>{{timestamp}}</span>
+        <div>{{text}}</div>
+    </div>
+    {{/each}}
+</script>
+
+{% endraw %}
+
 {% endblock %}
 
 {% block scripts %}
 {{ super() }}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.3/handlebars.min.js"></script>
 <script src="{{ url_for('static', filename='sockets.js') }}"></script>
 {% endblock %}

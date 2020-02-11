@@ -16,7 +16,7 @@ def index():
 @main.route('/channels', methods=['GET'])
 @login_required
 def channels():
-    return render_template('channels.html', user=current_user.username)
+    return render_template('channels.html', user=current_user)
 
 
 @socketio.on('connect')
