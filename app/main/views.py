@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 from flask_socketio import emit, join_room, leave_room
 
 from . import main
+from .socket_auth_helper import authenticated_only
 from .. import db
 from ..models import User, Channel, Message
 from app import socketio
@@ -20,6 +21,7 @@ def channels():
 
 
 @socketio.on('connect')
+@authenticated_only
 def connect():
     current_user.is_connected = True
     db.session.add(current_user._get_current_object())
@@ -32,6 +34,7 @@ def connect():
 
 
 @socketio.on('disconnect')
+@authenticated_only
 def disconnect():
     # doesn't occur if user close the tab
     current_user.is_connected = False
@@ -42,11 +45,13 @@ def disconnect():
 
 
 @socketio.on('left')
+@authenticated_only
 def left(channel):
     leave_room(channel)
 
 
 @socketio.on('joined')
+@authenticated_only
 def joined(channel):
     new_channel = Channel.query.filter_by(name=channel).first()
     if new_channel is None:
@@ -68,6 +73,7 @@ def joined(channel):
 
 
 @socketio.on('send message')
+@authenticated_only
 def send_message(text):
     if current_user.channel_id is not None:
         message = Message(text=text,
@@ -79,6 +85,7 @@ def send_message(text):
 
 
 @socketio.on('create channel')
+@authenticated_only
 def create_channel(channel):
     if Channel.query.filter_by(name=channel).first():
         emit('flash', [{'message': 'Channel with this name already exists.', 'category': 'danger'}])
