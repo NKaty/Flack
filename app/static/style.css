@@ -1,7 +1,42 @@
 input:not([type="hidden"]) + .invalid-feedback {
-  display: block;
+    display: block;
 }
 
 .active {
-  color: blue;
+    color: blue;
+}
+
+.chat-container {
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}
+
+.chat-section {
+    overflow-y: auto;
+    height: auto;
+    position: relative;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+
+.channels, .members {
+    flex: 1;
+}
+
+.messages {
+    flex: 2;
+}
+
+.channels::-webkit-scrollbar,
+.messages::-webkit-scrollbar,
+.members::-webkit-scrollbar {
+    display: none;
+}
+
+.fixed-header {
+    background-color: white;
+    padding-bottom: 10px;
 }

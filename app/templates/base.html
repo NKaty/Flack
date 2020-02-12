@@ -8,8 +8,8 @@
 {% endblock %}
 
 {% block navbar %}
-<nav class="navbar navbar-expand-sm navbar-dark bg-dark mb-3">
-    <a class="navbar-brand mb-0 h1" href="{{ url_for('main.index') }}">Chat</a>
+<nav id="navbar" class="navbar navbar-expand-sm navbar-dark bg-dark mb-3">
+    <a class="navbar-brand mb-0 h1" href="{{ url_for('main.index') }}">Flack</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-menu"
             aria-controls="auth" aria-expanded="false">
         <span class="navbar-toggler-icon"></span>
@@ -19,9 +19,11 @@
             <li class="nav-item {{ 'active' if request.path == url_for('main.index') else '' }}">
                 <a class="nav-link" href="{{ url_for('main.index') }}">Home</a>
             </li>
-            <li class="nav-item {{ 'active' if request.path == url_for('main.index') else '' }}">
-                <a class="nav-link" href=""></a>
+            {% if session.user_id %}
+            <li class="nav-item {{ 'active' if request.path == url_for('main.channels') else '' }}">
+                <a class="nav-link" href="{{ url_for('main.channels') }}">Chat</a>
             </li>
+            {% endif %}
         </ul>
         {% if session.user_id %}
         <ul class="navbar-nav ml-auto">

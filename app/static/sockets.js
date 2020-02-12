@@ -96,16 +96,53 @@ $(function () {
       this.membersTemplate = $('#members-template');
       this.messagesTemplate = $('#messages-template');
       this.logoutButton = $('#logout');
+      this.fixedHeaders = $('.fixed-header');
+      this.navbar = $('#navbar');
+      this.chatContainer = $('#chat-container');
       this.initialize();
     }
 
     initialize () {
       this.handlebarsHelpers();
+      this.setTopMarginAfterFixedHeaders();
+      this.setChatContainerHeight();
+      this.setListenerOnFlashMessageClose();
     }
 
     handlebarsHelpers () {
       Handlebars.registerHelper('if_eq', function (a, b, opts) {
         return a === b ? opts.fn(this) : opts.inverse(this);
+      });
+    }
+
+    setTopMarginAfterFixedHeaders () {
+      this.fixedHeaders.each((index, item) => {
+        $(item).next().first().css('padding-top', $(item).outerHeight(true));
+      });
+    }
+
+    setChatContainerHeight (flashMessage = null) {
+      let flashHeight;
+      if (flashMessage) {
+        const children = this.flashMessages.children();
+        if (children.length > 1) {
+          flashHeight = (parseInt(children.last().css('margin-bottom')) || 0) +
+            this.flashMessages.outerHeight(true) - $(flashMessage).outerHeight(true);
+        } else {
+          flashHeight = 0;
+        }
+      } else {
+        flashHeight = this.flashMessages.outerHeight(true) +
+          (parseInt(this.flashMessages.children().last().css('margin-bottom')) || 0);
+      }
+      const height = $(window).height() - this.navbar.outerHeight(true) - flashHeight;
+      this.chatContainer.outerHeight(height);
+    }
+
+    setListenerOnFlashMessageClose () {
+      const self = this;
+      this.flashMessages.on('click', '.flash-close', function () {
+        self.setChatContainerHeight($(this).parent());
       });
     }
 
@@ -162,6 +199,7 @@ $(function () {
       const template = Handlebars.compile(this.flashTemplate.html());
       const html = template(messages);
       this.flashMessages.append(html);
+      this.setChatContainerHeight();
     }
   }
 
