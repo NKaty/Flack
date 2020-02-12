@@ -7,10 +7,10 @@
 <div class="row">
     <div class="col-3">
         <h3>Channels</h3>
-        <div id="channels"></div>
+        <div class="scroll" id="channels"></div>
     </div>
     <div class="col-6">
-        <div id="messages-area">
+        <div class="scroll" id="messages-area">
             <div id="messages">
                 {% if not user.channel_id %}
                 <p>Select channel or create your own channel to start messaging</p>
@@ -26,7 +26,7 @@
     </div>
     <div class="col-3">
         <h3>Members</h3>
-        <div id="members"></div>
+        <div class="scroll" id="members"></div>
     </div>
 </div>
 

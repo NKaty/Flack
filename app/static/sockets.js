@@ -10,10 +10,11 @@ $(function () {
     initialize () {
       this.socket.on('connect', () => this.onConnect());
       this.socket.on('set active channel', channel => this.setActiveChanel(channel));
-      this.socket.on('update message', message => this.view.loadMessages([message], false));
+      this.socket.on('add new message', message => this.view.loadMessages([message], false));
       this.socket.on('load messages', messages => this.view.loadMessages(messages, true));
-      this.socket.on('load channels', channels => this.view.loadChannels(channels, this.activeChannel));
-      this.socket.on('members changed', members => this.view.loadMembers(members));
+      this.socket.on('load older messages', messages => this.view.loadMessages(messages, true));
+      this.socket.on('channel list changed', channels => this.view.loadChannels(channels, this.activeChannel));
+      this.socket.on('member list changed', members => this.view.loadMembers(members));
       this.socket.on('flash', messages => this.view.showFlashMessages(messages));
     }
 
@@ -23,6 +24,7 @@ $(function () {
       this.initializeChannelCreateEvent();
       this.initializeChannelCreateValidationEvent();
       this.initializeChannelCreateFormCloseEvent();
+      this.initializeLogoutEvent();
     }
 
     setActiveChanel (channel) {
@@ -46,7 +48,7 @@ $(function () {
         const message = this.view.messageInput.val();
         if (message.length > 0) {
           this.socket.emit('send message', message);
-          this.view.messageInput.val('');
+          this.view.sendMessageForm[0].reset();
         }
       });
     }
@@ -67,6 +69,14 @@ $(function () {
     initializeChannelCreateFormCloseEvent () {
       this.view.channelCreateFormClose();
     }
+
+    initializeLogoutEvent () {
+      this.view.logoutButton.on('click', (e) => {
+        e.preventDefault();
+        this.socket.disconnect();
+        document.location.href = this.view.logoutButton.prop('href');
+      });
+    }
   }
 
   class View {
@@ -85,6 +95,7 @@ $(function () {
       this.channelsTemplate = $('#channels-template');
       this.membersTemplate = $('#members-template');
       this.messagesTemplate = $('#messages-template');
+      this.logoutButton = $('#logout');
       this.initialize();
     }
 

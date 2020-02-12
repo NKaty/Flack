@@ -26,17 +26,18 @@ def connect():
     db.session.commit()
     if current_user.channel_id is not None:
         emit('set active channel', current_user.current_channel.name)
-        emit('members changed', current_user.current_channel.get_all_channel_members(),
+        emit('member list changed', current_user.current_channel.get_all_channel_members(),
              room=current_user.current_channel.name)
-    emit('load channels', Channel.get_all_channels())
+    emit('channel list changed', Channel.get_all_channels())
 
 
 @socketio.on('disconnect')
 def disconnect():
+    # doesn't occur if user close the tab
     current_user.is_connected = False
     db.session.add(current_user._get_current_object())
     db.session.commit()
-    emit('members changed', current_user.current_channel.get_all_channel_members(),
+    emit('member list changed', current_user.current_channel.get_all_channel_members(),
          room=current_user.current_channel.name)
 
 
@@ -58,11 +59,11 @@ def joined(channel):
         db.session.add(current_user._get_current_object())
         db.session.commit()
     if previous_channel is not None and previous_channel != channel:
-        emit('members changed',
+        emit('member list changed',
              Channel.query.filter_by(name=previous_channel).first().get_all_channel_members(),
              room=previous_channel)
     emit('load messages', current_user.current_channel.get_all_channel_messages())
-    emit('members changed', current_user.current_channel.get_all_channel_members(),
+    emit('member list changed', current_user.current_channel.get_all_channel_members(),
          room=current_user.current_channel.name)
 
 
@@ -74,7 +75,7 @@ def send_message(text):
                           channel=current_user.current_channel)
         db.session.add(message)
         db.session.commit()
-        emit('update message', message.to_json(), room=message.channel.name)
+        emit('add new message', message.to_json(), room=message.channel.name)
 
 
 @socketio.on('create channel')
@@ -85,6 +86,6 @@ def create_channel(channel):
         new_channel = Channel(name=channel)
         db.session.add(new_channel)
         db.session.commit()
-        emit('load channels', Channel.get_all_channels(), broadcast=True)
+        emit('channel list changed', Channel.get_all_channels(), broadcast=True)
         emit('flash',
              [{'message': 'Channel has been successfully created.', 'category': 'success'}])
