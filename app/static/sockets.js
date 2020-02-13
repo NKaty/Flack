@@ -106,7 +106,6 @@ $(function () {
       this.handlebarsHelpers();
       this.setTopMarginAfterFixedHeaders();
       this.setChatContainerHeight();
-      this.setListenerOnFlashMessageClose();
     }
 
     handlebarsHelpers () {
@@ -121,29 +120,20 @@ $(function () {
       });
     }
 
-    setChatContainerHeight (flashMessage = null) {
-      let flashHeight;
-      if (flashMessage) {
-        const children = this.flashMessages.children();
-        if (children.length > 1) {
-          flashHeight = (parseInt(children.last().css('margin-bottom')) || 0) +
-            this.flashMessages.outerHeight(true) - $(flashMessage).outerHeight(true);
-        } else {
-          flashHeight = 0;
-        }
-      } else {
-        flashHeight = this.flashMessages.outerHeight(true) +
-          (parseInt(this.flashMessages.children().last().css('margin-bottom')) || 0);
-      }
-      const height = $(window).height() - this.navbar.outerHeight(true) - flashHeight;
+    setChatContainerHeight () {
+      const height = $(window).height() - this.navbar.outerHeight(true) -
+        this.flashMessages.outerHeight(true) -
+        (parseInt(this.flashMessages.children().last().css('margin-bottom')) || 0);
       this.chatContainer.outerHeight(height);
     }
 
-    setListenerOnFlashMessageClose () {
+    onFlashMessageClosed () {
       const self = this;
-      this.flashMessages.on('click', '.flash-close', function () {
-        self.setChatContainerHeight($(this).parent());
-      });
+      const handler = function () {
+        self.setChatContainerHeight();
+        $(this).off('closed.bs.alert', handler);
+      };
+      $('.alert').on('closed.bs.alert', handler);
     }
 
     isChannelActive (channel) {
@@ -200,6 +190,7 @@ $(function () {
       const html = template(messages);
       this.flashMessages.append(html);
       this.setChatContainerHeight();
+      this.onFlashMessageClosed();
     }
   }
 
