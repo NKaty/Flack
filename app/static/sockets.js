@@ -4,15 +4,14 @@ $(function () {
       this.socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
       this.view = view;
       this.activeChannel = null;
+      this.messagesPage = null;
       this.initialize();
     }
 
     initialize () {
       this.socket.on('connect', () => this.onConnect());
-      this.socket.on('set active channel', channel => this.setActiveChanel(channel));
-      this.socket.on('add new message', message => this.view.loadMessages([message], false));
-      this.socket.on('load messages', messages => this.view.loadMessages(messages, true));
-      this.socket.on('load older messages', messages => this.view.loadMessages(messages, true));
+      this.socket.on('set active channel', channel => this.onSetActiveChanel(channel));
+      this.socket.on('load messages', data => this.onLoadChannels(data.messages, data.add));
       this.socket.on('channel list changed', channels => this.view.loadChannels(channels, this.activeChannel));
       this.socket.on('member list changed', members => this.view.loadMembers(members));
       this.socket.on('flash', messages => this.view.showFlashMessages(messages));
@@ -25,11 +24,17 @@ $(function () {
       this.initializeChannelCreateValidationEvent();
       this.initializeChannelCreateFormCloseEvent();
       this.initializeLogoutEvent();
+      this.initializeScroll();
     }
 
-    setActiveChanel (channel) {
+    onSetActiveChanel (channel) {
       this.activeChannel = channel;
       this.socket.emit('joined', this.activeChannel);
+    }
+
+    onLoadChannels (messages, add) {
+      if (!add) this.messagesPage = 1;
+        this.view.loadMessages(messages, add);
     }
 
     initializeChannelChangeEvent () {
@@ -77,6 +82,17 @@ $(function () {
         document.location.href = this.view.logoutButton.prop('href');
       });
     }
+
+    initializeScroll () {
+      this.view.sectionMessages.scroll(() => {
+        console.log(this.view.sectionMessages[0].scrollTop);
+        if (this.view.sectionMessages[0].scrollTop <= 0) {
+          console.log('emit');
+          this.messagesPage += 1;
+          this.socket.emit('load', this.messagesPage);
+        }
+      });
+    }
   }
 
   class View {
@@ -85,6 +101,7 @@ $(function () {
       this.channels = $('#channels');
       this.messages = $('#messages');
       this.members = $('#members');
+      this.sectionMessages = this.messages.closest('.chat-section');
       this.createChannelModal = $('#create-channel-modal');
       this.channelInput = this.createChannelModal.find('input[name="channel"]');
       this.submitNewChannelButton = this.createChannelModal.find('#submit');
@@ -165,12 +182,14 @@ $(function () {
       });
     }
 
-    loadMessages (messages, cleanContainer) {
+    loadMessages (messages, add) {
+      if (!messages.length && add) return;
       const template = Handlebars.compile(this.messagesTemplate.html());
       const html = template(messages);
-      if (cleanContainer) this.messages.html('');
+      if (!add) this.messages.html('');
       this.messages.append(html);
       this.sendMessageForm.removeClass('d-none');
+      if (!add) this.sectionMessages.scrollTop(this.sectionMessages[0].scrollHeight);
     }
 
     loadMembers (members) {

@@ -14,7 +14,7 @@ input:not([type="hidden"]) + .invalid-feedback {
 }
 
 .chat-section {
-    overflow-y: auto;
+    overflow-y: scroll;
     height: auto;
     position: relative;
     scrollbar-width: none;

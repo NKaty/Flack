@@ -44,9 +44,10 @@ class Channel(db.Model):
     users = db.relationship('User', backref='current_channel', lazy='dynamic')
     messages = db.relationship('Message', backref='channel', lazy='dynamic')
 
-    def get_all_channel_messages(self):
-        messages = self.messages.order_by(Message.timestamp.asc()).all()
-        return [message.to_json() for message in messages]
+    def get_all_channel_messages(self, page):
+        messages = self.messages.order_by(Message.timestamp.desc()).paginate(page, per_page=10,
+                                                                             error_out=False)
+        return [message.to_json() for message in messages.items[::-1]]
 
     def get_all_channel_members(self):
         members = self.users.filter_by(is_connected=True).order_by(User.username.asc()).all()
