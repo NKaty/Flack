@@ -4,14 +4,14 @@ $(function () {
       this.socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
       this.view = view;
       this.activeChannel = null;
-      this.messagesPage = null;
+      this.loadedMessagesNumber = 0;
       this.initialize();
     }
 
     initialize () {
       this.socket.on('connect', () => this.onConnect());
       this.socket.on('set active channel', channel => this.onSetActiveChanel(channel));
-      this.socket.on('load messages', data => this.onLoadChannels(data.messages, data.add));
+      this.socket.on('load messages', data => this.onLoadMessages(data.messages, data.fromSendMessage, data.fromScrollEvent));
       this.socket.on('channel list changed', channels => this.view.loadChannels(channels, this.activeChannel));
       this.socket.on('member list changed', members => this.view.loadMembers(members));
       this.socket.on('flash', messages => this.view.showFlashMessages(messages));
@@ -24,26 +24,32 @@ $(function () {
       this.initializeChannelCreateValidationEvent();
       this.initializeChannelCreateFormCloseEvent();
       this.initializeLogoutEvent();
-      this.initializeScroll();
+      this.initializeScrollEvent();
     }
 
     onSetActiveChanel (channel) {
       this.activeChannel = channel;
       this.socket.emit('joined', this.activeChannel);
+      this.socket.emit('get messages', this.loadedMessagesNumber, false);
     }
 
-    onLoadChannels (messages, add) {
-      if (!add) this.messagesPage = 1;
-        this.view.loadMessages(messages, add);
+    onLoadMessages (messages, fromSendMessage, fromScrollEvent) {
+      this.view.isMessagesContainerFull = false;
+      console.log(fromSendMessage, fromScrollEvent);
+      this.view.loadMessages(messages, this.loadedMessagesNumber, fromSendMessage, fromScrollEvent,
+                             () => this.socket.emit('get messages', this.loadedMessagesNumber, false));
+      this.loadedMessagesNumber += messages.length;
     }
 
     initializeChannelChangeEvent () {
       const self = this;
       this.view.channels.on('click', 'li', function () {
         if (self.view.isChannelActive(this)) return;
+        self.loadedMessagesNumber = 0;
         self.socket.emit('left', self.activeChannel);
         self.activeChannel = self.view.getDataAttribute(this, 'channel');
         self.socket.emit('joined', self.activeChannel);
+        self.socket.emit('get messages', self.loadedMessagesNumber, false);
         self.view.setChannelActive(this);
       });
     }
@@ -83,13 +89,12 @@ $(function () {
       });
     }
 
-    initializeScroll () {
+    initializeScrollEvent () {
       this.view.sectionMessages.scroll(() => {
         console.log(this.view.sectionMessages[0].scrollTop);
-        if (this.view.sectionMessages[0].scrollTop <= 0) {
+        if (this.view.sectionMessages[0].scrollTop <= 15) {
           console.log('emit');
-          this.messagesPage += 1;
-          this.socket.emit('load', this.messagesPage);
+          this.socket.emit('get messages', this.loadedMessagesNumber, true);
         }
       });
     }
@@ -116,6 +121,7 @@ $(function () {
       this.fixedHeaders = $('.fixed-header');
       this.navbar = $('#navbar');
       this.chatContainer = $('#chat-container');
+      this.isMessagesContainerFull = false;
       this.initialize();
     }
 
@@ -182,14 +188,19 @@ $(function () {
       });
     }
 
-    loadMessages (messages, add) {
-      if (!messages.length && add) return;
+    loadMessages (messages, offset, fromSendMessage, fromScrollEvent, cb = null) {
+      if (!messages.length && this.isMessagesContainerFull) return;
       const template = Handlebars.compile(this.messagesTemplate.html());
       const html = template(messages);
-      if (!add) this.messages.html('');
-      this.messages.append(html);
+      if (!offset) this.messages.html('');
+      if (fromSendMessage) this.messages.append(html);
+      else this.messages.prepend(html);
       this.sendMessageForm.removeClass('d-none');
-      if (!add) this.sectionMessages.scrollTop(this.sectionMessages[0].scrollHeight);
+      if (!fromScrollEvent) this.sectionMessages.scrollTop(this.sectionMessages[0].scrollHeight);
+      console.log(this.sectionMessages[0].scrollHeight, this.sectionMessages[0].clientHeight);
+      this.isMessagesContainerFull = fromSendMessage || !messages.length ||
+        (this.sectionMessages[0].scrollHeight > this.sectionMessages[0].clientHeight);
+      if (!this.isMessagesContainerFull && cb) cb();
     }
 
     loadMembers (members) {

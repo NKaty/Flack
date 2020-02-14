@@ -67,8 +67,8 @@ def joined(channel):
         emit('member list changed',
              Channel.query.filter_by(name=previous_channel).first().get_all_channel_members(),
              room=previous_channel)
-    emit('load messages',
-         {'messages': current_user.current_channel.get_all_channel_messages(page=1), 'add': False})
+    # emit('load messages',
+    #      {'messages': current_user.current_channel.get_all_channel_messages(offset=0), 'add': False})
     emit('member list changed', current_user.current_channel.get_all_channel_members(),
          room=current_user.current_channel.name)
 
@@ -82,11 +82,12 @@ def send_message(text):
                           channel=current_user.current_channel)
         db.session.add(message)
         db.session.commit()
-        # emit('load messages', {'messages': [message.to_json()], 'add': True},
-        #      room=message.channel.name)
         emit('load messages',
-             {'messages': current_user.current_channel.get_all_channel_messages(page=1),
-              'add': False}, room=message.channel.name)
+             {'messages': [message.to_json()], 'fromSendMessage': True, 'fromScrollEvent': False},
+             room=message.channel.name)
+        # emit('load messages',
+        #      {'messages': current_user.current_channel.get_all_channel_messages(page=1),
+        #       'add': False}, room=message.channel.name)
 
 
 @socketio.on('create channel')
@@ -103,9 +104,10 @@ def create_channel(channel):
              [{'message': 'Channel has been successfully created.', 'category': 'success'}])
 
 
-@socketio.on('load')
+@socketio.on('get messages')
 @authenticated_only
-def load(page):
+def get_messages(offset, from_scroll_event):
+    messages = current_user.current_channel.get_all_channel_messages(offset=offset)
+    print('get messages', len(messages))
     emit('load messages',
-         {'messages': current_user.current_channel.get_all_channel_messages(page=page),
-          'add': True})
+         {'messages': messages, 'fromSendMessage': False, 'fromScrollEvent': from_scroll_event})
