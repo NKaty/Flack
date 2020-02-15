@@ -5,6 +5,7 @@ $(function () {
       this.view = view;
       this.activeChannel = null;
       this.loadedMessagesNumber = 0;
+      this.allMessagesLoaded = false;
       this.initialize();
     }
 
@@ -35,6 +36,7 @@ $(function () {
 
     onLoadMessages (messages, fromSendMessage, fromScrollEvent) {
       this.view.isMessagesContainerFull = false;
+      this.allMessagesLoaded = this.allMessagesLoaded || (fromScrollEvent && !messages.length);
       console.log(fromSendMessage, fromScrollEvent);
       this.view.loadMessages(messages, this.loadedMessagesNumber, fromSendMessage, fromScrollEvent,
                              () => this.socket.emit('get messages', this.loadedMessagesNumber, false));
@@ -46,6 +48,7 @@ $(function () {
       this.view.channels.on('click', 'li', function () {
         if (self.view.isChannelActive(this)) return;
         self.loadedMessagesNumber = 0;
+        self.allMessagesLoaded = false;
         self.socket.emit('left', self.activeChannel);
         self.activeChannel = self.view.getDataAttribute(this, 'channel');
         self.socket.emit('joined', self.activeChannel);
@@ -90,14 +93,37 @@ $(function () {
     }
 
     initializeScrollEvent () {
-      this.view.sectionMessages.scroll(() => {
+      // this.view.sectionMessages.scroll(() => {
+      //   if (this.allMessagesLoaded) return;
+      //   console.log(this.view.sectionMessages[0].scrollTop);
+      //   if (this.view.sectionMessages[0].scrollTop <= 15) {
+      //     console.log('emit');
+      //     this.socket.emit('get messages', this.loadedMessagesNumber, true);
+      //   }
+      // });
+      this.view.sectionMessages.scroll(this.throttle(() => {
+        if (this.allMessagesLoaded) return;
         console.log(this.view.sectionMessages[0].scrollTop);
-        if (this.view.sectionMessages[0].scrollTop <= 15) {
+        if (this.view.sectionMessages[0].scrollTop <= 10) {
           console.log('emit');
           this.socket.emit('get messages', this.loadedMessagesNumber, true);
         }
-      });
+      }, 250));
     }
+
+    throttle (func, wait, immediate) {
+      let timeout;
+      return function () {
+        const context = this, args = arguments;
+        const later = function () {
+          timeout = null;
+          if (!immediate) func.apply(context, args);
+        };
+        const callNow = immediate && !timeout;
+        if (!timeout) timeout = setTimeout(later, wait);
+        if (callNow) func.apply(context, args);
+      };
+    };
   }
 
   class View {
