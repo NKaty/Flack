@@ -12,8 +12,11 @@ $(function () {
     initialize () {
       this.socket.on('connect', () => this.onConnect());
       this.socket.on('set active channel', channel => this.onSetActiveChanel(channel));
-      this.socket.on('load messages', data => this.onLoadMessages(data.messages, data.fromSendMessage, data.fromScrollEvent));
-      this.socket.on('channel list changed', channels => this.view.loadChannels(channels, this.activeChannel));
+      this.socket.on('load messages', data => this.onLoadMessages(data.messages,
+                                                                  data.fromSendMessage,
+                                                                  data.fromScrollEvent));
+      this.socket.on('channel list changed', channels => this.view.loadChannels(channels,
+                                                                                this.activeChannel));
       this.socket.on('member list changed', members => this.view.loadMembers(members));
       this.socket.on('flash', messages => this.view.showFlashMessages(messages));
     }
@@ -35,12 +38,12 @@ $(function () {
     }
 
     onLoadMessages (messages, fromSendMessage, fromScrollEvent) {
-      this.view.isMessagesContainerFull = false;
       this.allMessagesLoaded = this.allMessagesLoaded || (fromScrollEvent && !messages.length);
-      console.log(fromSendMessage, fromScrollEvent);
-      this.view.loadMessages(messages, this.loadedMessagesNumber, fromSendMessage, fromScrollEvent,
-                             () => this.socket.emit('get messages', this.loadedMessagesNumber, false));
+      const prevLoadedMessagesNumber = this.loadedMessagesNumber;
       this.loadedMessagesNumber += messages.length;
+      console.log('loadedMessagesNumber', this.loadedMessagesNumber);
+      this.view.loadMessages(messages, !!prevLoadedMessagesNumber, fromSendMessage, fromScrollEvent,
+                             () => this.socket.emit('get messages', this.loadedMessagesNumber, false));
     }
 
     initializeChannelChangeEvent () {
@@ -93,37 +96,15 @@ $(function () {
     }
 
     initializeScrollEvent () {
-      // this.view.sectionMessages.scroll(() => {
-      //   if (this.allMessagesLoaded) return;
-      //   console.log(this.view.sectionMessages[0].scrollTop);
-      //   if (this.view.sectionMessages[0].scrollTop <= 15) {
-      //     console.log('emit');
-      //     this.socket.emit('get messages', this.loadedMessagesNumber, true);
-      //   }
-      // });
-      this.view.sectionMessages.scroll(this.throttle(() => {
-        if (this.allMessagesLoaded) return;
-        console.log(this.view.sectionMessages[0].scrollTop);
-        if (this.view.sectionMessages[0].scrollTop <= 10) {
+      const intersectionObserver = new IntersectionObserver(entries => {
+        console.log('observer', this.view.sectionMessages[0].scrollTop);
+        if (this.loadedMessagesNumber && !this.allMessagesLoaded && entries[0].isIntersecting) {
           console.log('emit');
           this.socket.emit('get messages', this.loadedMessagesNumber, true);
         }
-      }, 250));
+      });
+      intersectionObserver.observe($('#sentinel')[0]);
     }
-
-    throttle (func, wait, immediate) {
-      let timeout;
-      return function () {
-        const context = this, args = arguments;
-        const later = function () {
-          timeout = null;
-          if (!immediate) func.apply(context, args);
-        };
-        const callNow = immediate && !timeout;
-        if (!timeout) timeout = setTimeout(later, wait);
-        if (callNow) func.apply(context, args);
-      };
-    };
   }
 
   class View {
@@ -147,7 +128,6 @@ $(function () {
       this.fixedHeaders = $('.fixed-header');
       this.navbar = $('#navbar');
       this.chatContainer = $('#chat-container');
-      this.isMessagesContainerFull = false;
       this.initialize();
     }
 
@@ -214,19 +194,28 @@ $(function () {
       });
     }
 
-    loadMessages (messages, offset, fromSendMessage, fromScrollEvent, cb = null) {
-      if (!messages.length && this.isMessagesContainerFull) return;
+    loadMessages (messages, isOffset, fromSendMessage, fromScrollEvent, cb = null) {
+      if (!isOffset) this.messages.html('');
+      if (!messages.length) return;
       const template = Handlebars.compile(this.messagesTemplate.html());
       const html = template(messages);
-      if (!offset) this.messages.html('');
-      if (fromSendMessage) this.messages.append(html);
-      else this.messages.prepend(html);
+      if (fromSendMessage) {
+        this.messages.append(html);
+        this.sectionMessages.scrollTop(this.sectionMessages[0].scrollHeight);
+      } else if (fromScrollEvent) {
+        const prevScrollTop = this.sectionMessages.scrollTop();
+        const wrappedHtml = $(`<div id="wrapper">${html}</div>`);
+        this.messages.prepend(wrappedHtml);
+        this.sectionMessages.scrollTop(prevScrollTop + wrappedHtml.outerHeight());
+        wrappedHtml.children().unwrap();
+      } else {
+        this.messages.prepend(html);
+        this.sectionMessages.scrollTop(this.sectionMessages[0].scrollHeight);
+      }
       this.sendMessageForm.removeClass('d-none');
-      if (!fromScrollEvent) this.sectionMessages.scrollTop(this.sectionMessages[0].scrollHeight);
-      console.log(this.sectionMessages[0].scrollHeight, this.sectionMessages[0].clientHeight);
-      this.isMessagesContainerFull = fromSendMessage || !messages.length ||
+      const isMessagesContainerFull = fromSendMessage ||
         (this.sectionMessages[0].scrollHeight > this.sectionMessages[0].clientHeight);
-      if (!this.isMessagesContainerFull && cb) cb();
+      if (!isMessagesContainerFull && cb) cb();
     }
 
     loadMembers (members) {

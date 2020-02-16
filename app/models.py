@@ -45,6 +45,7 @@ class Channel(db.Model):
     messages = db.relationship('Message', backref='channel', lazy='dynamic')
 
     def get_all_channel_messages(self, offset):
+        print('offset', offset)
         messages = self.messages.order_by(Message.timestamp.desc()).offset(offset).limit(10).all()
         return [message.to_json() for message in messages[::-1]]
 
