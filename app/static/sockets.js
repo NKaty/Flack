@@ -38,7 +38,7 @@ $(function () {
     }
 
     onLoadMessages (messages, fromSendMessage, fromScrollEvent) {
-      this.allMessagesLoaded = this.allMessagesLoaded || (fromScrollEvent && !messages.length);
+      this.allMessagesLoaded = this.allMessagesLoaded || !messages.length;
       const prevLoadedMessagesNumber = this.loadedMessagesNumber;
       this.loadedMessagesNumber += messages.length;
       console.log('loadedMessagesNumber', this.loadedMessagesNumber);
@@ -50,14 +50,19 @@ $(function () {
       const self = this;
       this.view.channels.on('click', 'li', function () {
         if (self.view.isChannelActive(this)) return;
-        self.loadedMessagesNumber = 0;
-        self.allMessagesLoaded = false;
+        self.resetAtChannelChange();
         self.socket.emit('left', self.activeChannel);
         self.activeChannel = self.view.getDataAttribute(this, 'channel');
         self.socket.emit('joined', self.activeChannel);
         self.socket.emit('get messages', self.loadedMessagesNumber, false);
         self.view.setChannelActive(this);
       });
+    }
+
+    resetAtChannelChange () {
+      this.loadedMessagesNumber = 0;
+      this.allMessagesLoaded = false;
+      this.view.displaySpinners();
     }
 
     initializeMessageSendEvent () {
@@ -128,6 +133,8 @@ $(function () {
       this.fixedHeaders = $('.fixed-header');
       this.navbar = $('#navbar');
       this.chatContainer = $('#chat-container');
+      this.spinners = $('.spinner-border');
+      this.messageSpinner = $('#message-spinner');
       this.initialize();
     }
 
@@ -154,6 +161,10 @@ $(function () {
         this.flashMessages.outerHeight(true) -
         (parseInt(this.flashMessages.children().last().css('margin-bottom')) || 0);
       this.chatContainer.outerHeight(height);
+    }
+
+    displaySpinners () {
+      this.spinners.each((index, item) => $(item).removeClass('d-none'));
     }
 
     onFlashMessageClosed () {
@@ -196,7 +207,10 @@ $(function () {
 
     loadMessages (messages, isOffset, fromSendMessage, fromScrollEvent, cb = null) {
       if (!isOffset) this.messages.html('');
-      if (!messages.length) return;
+      if (!messages.length) {
+        this.messageSpinner.addClass('d-none');
+        return;
+      }
       const template = Handlebars.compile(this.messagesTemplate.html());
       const html = template(messages);
       if (fromSendMessage) {
@@ -204,10 +218,20 @@ $(function () {
         this.sectionMessages.scrollTop(this.sectionMessages[0].scrollHeight);
       } else if (fromScrollEvent) {
         const prevScrollTop = this.sectionMessages.scrollTop();
-        const wrappedHtml = $(`<div id="wrapper">${html}</div>`);
-        this.messages.prepend(wrappedHtml);
-        this.sectionMessages.scrollTop(prevScrollTop + wrappedHtml.outerHeight());
-        wrappedHtml.children().unwrap();
+        // variant without spinner
+        // const wrappedHtml = $(`<div id="wrapper">${html}</div>`);
+        // this.messages.prepend(wrappedHtml);
+        // this.sectionMessages.scrollTop(prevScrollTop + wrappedHtml.outerHeight());
+        // wrappedHtml.children().unwrap();
+        // variant with spinner
+        const wrappedHtml = $(`<div id="wrapper" class="invisible">${html}</div>`);
+        this.messages.append(wrappedHtml);
+        const htmlHeight = wrappedHtml.outerHeight();
+        wrappedHtml.remove();
+        setTimeout(() => {
+          this.messages.prepend(html);
+          this.sectionMessages.scrollTop(prevScrollTop + htmlHeight);
+        }, 300);
       } else {
         this.messages.prepend(html);
         this.sectionMessages.scrollTop(this.sectionMessages[0].scrollHeight);

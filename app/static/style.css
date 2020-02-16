@@ -41,7 +41,7 @@ input:not([type="hidden"]) + .invalid-feedback {
     padding-bottom: 10px;
 }
 
-#sentinel {
-    width: 1px;
-    height: 1px;
-}
+/*#sentinel {*/
+/*    width: 10px;*/
+/*    height: 10px;*/
+/*}*/

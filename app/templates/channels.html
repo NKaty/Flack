@@ -14,7 +14,11 @@
         <div id="channels"></div>
     </div>
     <div class="chat-section messages">
-        <div id="sentinel"></div>
+        <div id="sentinel" class="d-flex justify-content-center mb-2">
+            <div class="spinner-border text-secondary" id="message-spinner" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
         <div id="messages-area">
             <div id="messages">
                 {% if not user.channel_id %}
