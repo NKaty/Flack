@@ -28,8 +28,9 @@ def connect():
     db.session.commit()
     if current_user.channel_id is not None:
         emit('set active channel', current_user.current_channel.name)
-        emit('member list changed', current_user.current_channel.get_all_channel_members(),
-             room=current_user.current_channel.name)
+        # emit('load members',
+        #      {'members': current_user.current_channel.get_all_channel_members(offset=0),
+        #       'isReload': True}, room=current_user.current_channel.name)
         # emit('load messages',
         #      {'messages': current_user.current_channel.get_all_channel_messages(offset=0),
         #       'fromSendMessage': False, 'fromScrollEvent': False})
@@ -43,8 +44,8 @@ def disconnect():
     current_user.is_connected = False
     db.session.add(current_user._get_current_object())
     db.session.commit()
-    emit('member list changed', current_user.current_channel.get_all_channel_members(),
-         room=current_user.current_channel.name)
+    emit('load members', {'members': current_user.current_channel.get_all_channel_members(offset=0),
+                          'isReload': True}, room=current_user.current_channel.name)
 
 
 @socketio.on('left')
@@ -67,11 +68,12 @@ def joined(channel):
         db.session.add(current_user._get_current_object())
         db.session.commit()
     if previous_channel is not None and previous_channel != channel:
-        emit('member list changed',
-             Channel.query.filter_by(name=previous_channel).first().get_all_channel_members(),
+        emit('load members', {'members': Channel.query.filter_by(
+            name=previous_channel).first().get_all_channel_members(offset=0), 'isReload': True},
              room=previous_channel)
-    emit('member list changed', current_user.current_channel.get_all_channel_members(),
-         room=current_user.current_channel.name)
+    emit('load members',
+         {'members': current_user.current_channel.get_all_channel_members(offset=0),
+          'isReload': True}, room=current_user.current_channel.name)
 
 
 @socketio.on('send message')
@@ -118,3 +120,12 @@ def get_messages(offset, from_scroll_event):
 def get_channels(offset):
     emit('load channels',
          {'channels': Channel.get_all_channels(offset=offset), 'isReload': False})
+
+
+@socketio.on('get members')
+@authenticated_only
+def get_members(offset):
+    if current_user.channel_id is not None:
+        emit('load members',
+             {'members': current_user.current_channel.get_all_channel_members(offset=offset),
+              'isReload': False})

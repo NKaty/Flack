@@ -8,6 +8,8 @@ $(function () {
       this.allMessagesLoaded = false;
       this.loadedChannelsNumber = 0;
       this.allChannelsLoaded = false;
+      this.loadedMembersNumber = 0;
+      this.allMembersLoaded = false;
       this.initialize();
     }
 
@@ -18,7 +20,7 @@ $(function () {
                                                                   data.fromSendMessage,
                                                                   data.fromScrollEvent));
       this.socket.on('load channels', data => this.onLoadChannels(data.channels, data.isReload));
-      this.socket.on('member list changed', members => this.view.loadMembers(members));
+      this.socket.on('load members', data => this.onLoadMembers(data.members, data.isReload));
       this.socket.on('flash', messages => this.view.showFlashMessages(messages));
     }
 
@@ -50,8 +52,8 @@ $(function () {
 
     onLoadChannels (channels, isReload) {
       if (isReload) {
-        this.allChannelsLoaded = 0;
-        this.loadedChannelsNumber = 0;
+        this.allChannelsLoaded = false;
+        this.loadedChannelsNumber = channels.length;
         // this.view.displaySpinner(this.view.channelsSpinner);
       } else {
         this.allChannelsLoaded = this.allChannelsLoaded || !channels.length;
@@ -62,6 +64,19 @@ $(function () {
                              () => this.socket.emit('get channels', this.loadedChannelsNumber));
     }
 
+    onLoadMembers (members, isReload) {
+      if (isReload) {
+        this.allMembersLoaded = false;
+        this.loadedMembersNumber = members.length;
+      } else {
+        this.allMembersLoaded = this.allMembersLoaded || !members.length;
+        this.loadedMembersNumber += members.length;
+      }
+      console.log('load members', this.loadedMembersNumber);
+      this.view.loadMembers(members, isReload,
+                             () => this.socket.emit('get members', this.loadedMembersNumber));
+    }
+
     initializeChannelChangeEvent () {
       const self = this;
       this.view.channels.on('click', 'li', function () {
@@ -70,7 +85,7 @@ $(function () {
         self.socket.emit('left', self.activeChannel);
         self.activeChannel = self.view.getDataAttribute(this, 'channel');
         self.socket.emit('joined', self.activeChannel);
-        self.socket.emit('get messages', self.loadedMessagesNumber, false);
+        self.socket.emit('get messages', self.loadedMessagesNumber, true);
         self.view.setChannelActive(this);
       });
     }
@@ -128,8 +143,10 @@ $(function () {
             !this.allChannelsLoaded && entry.isIntersecting) {
             console.log('emit channels');
             this.socket.emit('get channels', this.loadedChannelsNumber);
-          } else if (entry.target.id === 'members-sentinel' && entry.isIntersecting) {
+          } else if (entry.target.id === 'members-sentinel' && this.loadedMembersNumber &&
+            !this.allMembersLoaded && entry.isIntersecting) {
             console.log('emit members');
+            this.socket.emit('get members', this.loadedMembersNumber);
           }
         });
 
@@ -150,6 +167,7 @@ $(function () {
       this.members = $('#members');
       this.sectionMessages = this.messages.closest('.chat-section');
       this.sectionChannels = this.channels.closest('.chat-section');
+      this.sectionMembers = this.members.closest('.chat-section');
       this.createChannelModal = $('#create-channel-modal');
       this.channelInput = this.createChannelModal.find('input[name="channel"]');
       this.submitNewChannelButton = this.createChannelModal.find('#submit');
@@ -266,21 +284,25 @@ $(function () {
         this.sectionMessages.scrollTop(this.sectionMessages[0].scrollHeight);
       }
       this.sendMessageForm.removeClass('d-none');
-      console.log(this.sectionMessages[0].scrollHeight, this.sectionMessages[0].clientHeight)
+      console.log(this.sectionMessages[0].scrollHeight, this.sectionMessages[0].clientHeight);
       const isMessagesContainerFull = fromSendMessage ||
         (this.sectionMessages[0].scrollHeight > this.sectionMessages[0].clientHeight);
       if (!isMessagesContainerFull && cb) cb();
     }
 
-    loadMembers (members) {
+    loadMembers (members, isReload, cb) {
+      if (isReload) this.members.html('');
+      if (!members.length) return;
       const template = Handlebars.compile(this.membersTemplate.html());
       const html = template(members);
-      this.members.html('').append(html);
+      this.members.append(html);
+      const isMembersContainerFull = this.sectionMembers[0].scrollHeight > this.sectionMembers[0].clientHeight;
+      if (!isMembersContainerFull && cb) cb();
     }
 
     loadChannels (channels, activeChannel, isReload, cb = null) {
       if (isReload) this.channels.html('');
-      // if (!channels.length) return this.channelsSpinner.addClass('d-none');
+      if (!channels.length) return; // this.channelsSpinner.addClass('d-none');
       const template = Handlebars.compile(this.channelsTemplate.html());
       const html = template({ channels: channels, activeChannel: activeChannel });
       this.channels.append(html);

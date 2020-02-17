@@ -5,17 +5,17 @@
 {% block page_content %}
 <div class="chat-container" id="chat-container">
     <div class="chat-section channels">
-            <div class="fixed-header position-fixed">
-                <h3>Channels</h3>
-                <button id="create-channel" data-toggle="modal" data-target="#create-channel-modal">
-                    Create channel
-                </button>
-            </div>
-            <ul id="channels"></ul>
+        <div class="fixed-header position-fixed">
+            <h3>Channels</h3>
+            <button id="create-channel" data-toggle="modal" data-target="#create-channel-modal">
+                Create channel
+            </button>
+        </div>
+        <ul id="channels"></ul>
         <div id="channels-sentinel" class="sentinel d-flex justify-content-center mt-2">
-<!--            <div class="spinner-border text-secondary" id="channels-spinner" role="status">-->
-<!--                <span class="sr-only">Loading...</span>-->
-<!--            </div>-->
+            <!--            <div class="spinner-border text-secondary" id="channels-spinner" role="status">-->
+            <!--                <span class="sr-only">Loading...</span>-->
+            <!--            </div>-->
         </div>
     </div>
     <div class="chat-section messages">
@@ -40,11 +40,11 @@
     </div>
     <div class="chat-section members">
         <h3 class="fixed-header position-fixed">Members</h3>
-        <div id="members"></div>
+        <ul id="members"></ul>
         <div id="members-sentinel" class="sentinel d-flex justify-content-center mt-2">
-<!--            <div class="spinner-border text-secondary" id="members-spinner" role="status">-->
-<!--                <span class="sr-only">Loading...</span>-->
-<!--            </div>-->
+            <!--            <div class="spinner-border text-secondary" id="members-spinner" role="status">-->
+            <!--                <span class="sr-only">Loading...</span>-->
+            <!--            </div>-->
         </div>
     </div>
 </div>
@@ -97,11 +97,9 @@
 </script>
 
 <script id="members-template" type="text/x-handlebars-template">
-    <ul>
-        {{#each .}}
-        <li>{{this}}</li>
-        {{/each}}
-    </ul>
+    {{#each .}}
+    <li>{{this}}</li>
+    {{/each}}
 </script>
 
 <script id="messages-template" type="text/x-handlebars-template">
