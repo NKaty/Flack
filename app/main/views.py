@@ -30,7 +30,10 @@ def connect():
         emit('set active channel', current_user.current_channel.name)
         emit('member list changed', current_user.current_channel.get_all_channel_members(),
              room=current_user.current_channel.name)
-    emit('channel list changed', Channel.get_all_channels())
+        # emit('load messages',
+        #      {'messages': current_user.current_channel.get_all_channel_messages(offset=0),
+        #       'fromSendMessage': False, 'fromScrollEvent': False})
+    # emit('load channels', {'channels': Channel.get_all_channels(offset=0), 'isReload': False})
 
 
 @socketio.on('disconnect')
@@ -94,7 +97,8 @@ def create_channel(channel):
         new_channel = Channel(name=channel)
         db.session.add(new_channel)
         db.session.commit()
-        emit('channel list changed', Channel.get_all_channels(), broadcast=True)
+        emit('load channels', {'channels': Channel.get_all_channels(offset=0), 'isReload': True},
+             broadcast=True)
         emit('flash',
              [{'message': 'Channel has been successfully created.', 'category': 'success'}])
 
@@ -107,3 +111,10 @@ def get_messages(offset, from_scroll_event):
     print('view offset', offset)
     emit('load messages',
          {'messages': messages, 'fromSendMessage': False, 'fromScrollEvent': from_scroll_event})
+
+
+@socketio.on('get channels')
+@authenticated_only
+def get_channels(offset):
+    emit('load channels',
+         {'channels': Channel.get_all_channels(offset=offset), 'isReload': False})

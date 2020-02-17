@@ -46,7 +46,7 @@ class Channel(db.Model):
 
     def get_all_channel_messages(self, offset):
         print('offset', offset)
-        messages = self.messages.order_by(Message.timestamp.desc()).offset(offset).limit(10).all()
+        messages = self.messages.order_by(Message.timestamp.desc()).offset(offset).limit(20).all()
         return [message.to_json() for message in messages[::-1]]
 
     def get_all_channel_members(self):
@@ -54,8 +54,8 @@ class Channel(db.Model):
         return [member.username for member in members]
 
     @staticmethod
-    def get_all_channels():
-        channels = Channel.query.order_by(Channel.name.asc()).all()
+    def get_all_channels(offset):
+        channels = Channel.query.order_by(Channel.name.asc()).offset(offset).limit(10).all()
         return [channel.name for channel in channels]
 
     def __repr__(self):

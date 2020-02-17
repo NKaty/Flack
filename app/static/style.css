@@ -40,8 +40,3 @@ input:not([type="hidden"]) + .invalid-feedback {
     background-color: white;
     padding-bottom: 10px;
 }
-
-/*#sentinel {*/
-/*    width: 10px;*/
-/*    height: 10px;*/
-/*}*/
