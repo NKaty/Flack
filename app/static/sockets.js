@@ -43,10 +43,10 @@ $(function () {
 
     onLoadMessages (messages, fromSendMessage, fromScrollEvent) {
       this.allMessagesLoaded = this.allMessagesLoaded || !messages.length;
-      const prevLoadedMessagesNumber = this.loadedMessagesNumber;
+      const isReload = !!this.loadedMessagesNumber;
       this.loadedMessagesNumber += messages.length;
       console.log('loadedMessagesNumber', this.loadedMessagesNumber);
-      this.view.loadMessages(messages, !!prevLoadedMessagesNumber, fromSendMessage, fromScrollEvent,
+      this.view.loadMessages(messages, isReload, fromSendMessage, fromScrollEvent,
                              () => this.socket.emit('get messages', this.loadedMessagesNumber, false));
     }
 
@@ -255,8 +255,8 @@ $(function () {
       });
     }
 
-    loadMessages (messages, isOffset, fromSendMessage, fromScrollEvent, cb = null) {
-      if (!isOffset) this.messages.html('');
+    loadMessages (messages, isReload, fromSendMessage, fromScrollEvent, cb = null) {
+      if (!isReload) this.messages.html('');
       if (!messages.length) return this.messagesSpinner.addClass('d-none');
       const template = Handlebars.compile(this.messagesTemplate.html());
       const html = template(messages);
