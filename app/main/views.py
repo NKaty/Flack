@@ -28,13 +28,6 @@ def connect():
     db.session.commit()
     if current_user.channel_id is not None:
         emit('set active channel', current_user.current_channel.name)
-        # emit('load members',
-        #      {'members': current_user.current_channel.get_all_channel_members(offset=0),
-        #       'isReload': True}, room=current_user.current_channel.name)
-        # emit('load messages',
-        #      {'messages': current_user.current_channel.get_all_channel_messages(offset=0),
-        #       'fromSendMessage': False, 'fromScrollEvent': False})
-    # emit('load channels', {'channels': Channel.get_all_channels(offset=0), 'isReload': False})
 
 
 @socketio.on('disconnect')
