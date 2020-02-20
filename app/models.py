@@ -56,7 +56,7 @@ class Channel(db.Model):
 
     @staticmethod
     def get_all_channels(offset):
-        channels = Channel.query.order_by(Channel.name.asc()).offset(offset).limit(1).all()
+        channels = Channel.query.order_by(Channel.name.asc()).offset(offset).limit(10).all()
         return [channel.name for channel in channels]
 
     def __repr__(self):

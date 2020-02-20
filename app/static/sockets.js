@@ -62,9 +62,9 @@ $(function () {
       this.socket.on('connect', () => this.onConnect());
       this.socket.on('set active channel', channel => this.onSetActiveChanel(channel));
       this.socket.on('load messages', data => this.messages.onLoad(data.messages,
-                                                                  !this.messages.loadedNumber,
-                                                                  data.fromSendMessage,
-                                                                  data.fromScrollEvent));
+                                                                   !this.messages.loadedNumber,
+                                                                   data.fromSendMessage,
+                                                                   data.fromScrollEvent));
       this.socket.on('load channels', data => this.channels.onLoad(data.channels, data.isReload,
                                                                    this.activeChannel));
       this.socket.on('load members', data => this.members.onLoad(data.members, data.isReload));
@@ -76,7 +76,7 @@ $(function () {
       this.initializeChannelChangeEvent();
       this.initializeMessageSendEvent();
       this.initializeChannelCreateEvent();
-      this.initializeChannelCreateValidationEvent();
+      this.initializeChannelCreateOpenEvent();
       this.initializeChannelCreateFormCloseEvent();
       this.initializeLogoutEvent();
     }
@@ -152,14 +152,20 @@ $(function () {
     initializeChannelCreateEvent () {
       this.view.submitNewChannelButton.on('click', () => {
         const channel = this.view.channelInput.val();
-        if (channel.length > 0) {
+        if (this.view.isChannelCreateFormValid(channel)) {
           this.socket.emit('create channel', channel);
+          this.view.createChannelModal.modal('hide');
+        } else {
+          this.view.showFormFieldErrorMessage(
+            this.view.channelInput,
+            'Channel name must be between 1 and 64 characters long and have only letters, numbers, dots or underscores.'
+          );
         }
       });
     }
 
-    initializeChannelCreateValidationEvent () {
-      this.view.channelCreateValidation();
+    initializeChannelCreateOpenEvent () {
+      this.view.channelCreateFormOpen();
     }
 
     initializeChannelCreateFormCloseEvent () {
@@ -245,6 +251,21 @@ $(function () {
       $('.alert').on('closed.bs.alert', handler);
     }
 
+    showFormFieldErrorMessage (field, error) {
+      const nextSibling = field.next();
+      if (nextSibling.hasClass('invalid-feedback')) {
+        nextSibling.text(error);
+      } else {
+        $(`<div class="invalid-feedback">${error}</div>`).insertAfter(field);
+      }
+      field.focus();
+    }
+
+    removeFormFieldErrorMessage (field) {
+      const nextSibling = field.next();
+      if (nextSibling.hasClass('invalid-feedback')) nextSibling.remove();
+    }
+
     displaySpinner (spinner) {
       spinner.removeClass('d-none');
     }
@@ -261,7 +282,12 @@ $(function () {
       return $(elem).data(attr);
     }
 
-    channelCreateValidation () {
+    isChannelCreateFormValid (channelName) {
+      return channelName.length > 0 && channelName.length < 65 &&
+        /^[A-Za-z][A-Za-z0-9_.]*$/.test(channelName);
+    }
+
+    channelCreateFormOpen () {
       this.createChannelModal.on('shown.bs.modal', () => {
         this.channelInput.focus();
         this.submitNewChannelButton.prop('disabled', true);
@@ -274,6 +300,7 @@ $(function () {
     channelCreateFormClose () {
       this.createChannelModal.on('hidden.bs.modal', () => {
         this.submitNewChannelButton.prop('disabled', true);
+        this.removeFormFieldErrorMessage(this.channelInput);
         this.createChannelModal.find('form')[0].reset();
       });
     }

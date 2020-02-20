@@ -1,3 +1,5 @@
+import re
+
 from flask import render_template, request
 from flask_login import login_required, current_user
 from flask_socketio import emit, join_room, leave_room
@@ -86,7 +88,12 @@ def send_message(text):
 @socketio.on('create channel')
 @authenticated_only
 def create_channel(channel):
-    if Channel.query.filter_by(name=channel).first():
+    if len(channel) < 1 or len(channel) > 64 or not re.fullmatch('^[A-Za-z][A-Za-z0-9_.]*$',
+                                                                 channel):
+        emit('flash', [{'message': 'Channel name must be between 1 and 64 characters long and '
+                                   'have only letters, numbers, dots or underscores.',
+                        'category': 'danger'}])
+    elif Channel.query.filter_by(name=channel).first():
         emit('flash', [{'message': 'Channel with this name already exists.', 'category': 'danger'}])
     else:
         new_channel = Channel(name=channel)
@@ -111,8 +118,7 @@ def get_messages(offset, from_scroll_event):
 @socketio.on('get channels')
 @authenticated_only
 def get_channels(offset):
-    emit('load channels',
-         {'channels': Channel.get_all_channels(offset=offset), 'isReload': False})
+    emit('load channels', {'channels': Channel.get_all_channels(offset=offset), 'isReload': False})
 
 
 @socketio.on('get members')
