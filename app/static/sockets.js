@@ -355,6 +355,12 @@ $(function () {
       this.flashMessages.append(html);
       this.setChatContainerHeight();
       this.onFlashMessageClosed();
+      this.closeFlashMessages(messages.length);
+    }
+
+    closeFlashMessages (messagesLen) {
+      const alerts = this.flashMessages.find('.alert').slice(-messagesLen);
+      alerts.each((index, item) => setTimeout(() => $(item).alert('close'), 10000));
     }
   }
 
