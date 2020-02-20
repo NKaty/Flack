@@ -145,9 +145,9 @@ $(function () {
     initializeMessageSendEvent () {
       this.view.sendMessageButton.on('click', () => {
         const message = this.view.messageInput.val();
-        if (message.length > 0) {
+        if (this.view.isSendMessageFormValid(message)) {
           this.socket.emit('send message', message);
-          this.view.sendMessageForm[0].reset();
+          this.view.resetSendMessageForm();
         }
       });
     }
@@ -224,6 +224,7 @@ $(function () {
       this.handlebarsHelpers();
       this.setTopMarginAfterFixedHeaders();
       this.setChatContainerHeight();
+      this.validateSendMessageForm();
     }
 
     handlebarsHelpers () {
@@ -290,6 +291,10 @@ $(function () {
         /^[A-Za-z][A-Za-z0-9_.]*$/.test(channelName);
     }
 
+    isSendMessageFormValid (message) {
+      return message.length > 0;
+    }
+
     channelCreateFormOpen () {
       this.createChannelModal.on('shown.bs.modal', () => {
         this.channelInput.focus();
@@ -306,6 +311,17 @@ $(function () {
         this.removeFormFieldErrorMessage(this.channelInput);
         this.createChannelModal.find('form')[0].reset();
       });
+    }
+
+    validateSendMessageForm () {
+      this.messageInput.on('keyup', () => {
+        this.sendMessageButton.prop('disabled', !this.isSendMessageFormValid(this.messageInput.val()));
+      });
+    }
+
+    resetSendMessageForm () {
+      this.sendMessageForm[0].reset();
+      this.sendMessageButton.prop('disabled', true);
     }
 
     renderMessages (messages, fromSendMessage, fromScrollEvent) {
