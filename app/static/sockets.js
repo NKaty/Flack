@@ -11,10 +11,12 @@ $(function () {
       this.renderer = options.renderer;
       this.loadedNumber = 0;
       this.allLoaded = false;
+      this.isReload = false;
       this.initializeScroll();
     }
 
     onLoad (list, isReload, ...args) {
+      this.isReload = isReload;
       if (isReload) {
         this.allLoaded = false;
         this.loadedNumber = list.length;
@@ -22,7 +24,7 @@ $(function () {
         this.allLoaded = this.allLoaded || !list.length;
         this.loadedNumber += list.length;
       }
-      console.log(`load ${this.name}`, this.loadedNumber);
+      // console.log(`load ${this.name}`, this.loadedNumber);
       const cb = list.length ? this.loadCallback : null;
       this.loadList(list, isReload, cb, ...args);
     }
@@ -34,16 +36,17 @@ $(function () {
         return;
       }
       this.renderer(list, ...args);
-      console.log(this.name, this.component[0].scrollHeight, this.component[0].clientHeight);
+      // console.log(this.name, this.component[0].scrollHeight, this.component[0].clientHeight);
       const isContainerFull = this.component[0].scrollHeight > this.component[0].clientHeight;
       if (!isContainerFull && cb) cb();
     }
 
     initializeScroll () {
       const intersectionObserver = new IntersectionObserver(entries => {
-        if (this.loadedNumber && !this.allLoaded && entries[0].isIntersecting) {
-          if (this.scrollCallback) this.scrollCallback();
-          console.log(`emit ${this.name}`);
+        if (this.loadedNumber && !this.isReload && !this.allLoaded &&
+          entries[0].isIntersecting && this.scrollCallback) {
+          this.scrollCallback();
+          // console.log(`emit ${this.name}`);
         }
       });
       intersectionObserver.observe(this.sentinel[0]);

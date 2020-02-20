@@ -99,6 +99,7 @@ def create_channel(channel):
         new_channel = Channel(name=channel)
         db.session.add(new_channel)
         db.session.commit()
+        print('create channel emit')
         emit('load channels', {'channels': Channel.get_all_channels(offset=0), 'isReload': True},
              broadcast=True)
         emit('flash',
@@ -109,8 +110,8 @@ def create_channel(channel):
 @authenticated_only
 def get_messages(offset, from_scroll_event):
     messages = current_user.current_channel.get_all_channel_messages(offset=offset)
-    print('get messages', len(messages))
-    print('view offset', offset)
+    # print('get messages', len(messages))
+    # print('view offset', offset)
     emit('load messages',
          {'messages': messages, 'fromSendMessage': False, 'fromScrollEvent': from_scroll_event})
 
@@ -119,6 +120,7 @@ def get_messages(offset, from_scroll_event):
 @authenticated_only
 def get_channels(offset):
     emit('load channels', {'channels': Channel.get_all_channels(offset=offset), 'isReload': False})
+    # print('get channels emit', current_user.username, offset)
 
 
 @socketio.on('get members')
