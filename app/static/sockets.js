@@ -11,12 +11,11 @@ $(function () {
       this.renderer = options.renderer;
       this.loadedNumber = 0;
       this.allLoaded = false;
-      this.isReload = false;
+      this.isContainerFull = false;
       this.initializeScroll();
     }
 
     onLoad (list, isReload, ...args) {
-      this.isReload = isReload;
       if (isReload) {
         this.allLoaded = false;
         this.loadedNumber = list.length;
@@ -24,7 +23,7 @@ $(function () {
         this.allLoaded = this.allLoaded || !list.length;
         this.loadedNumber += list.length;
       }
-      // console.log(`load ${this.name}`, this.loadedNumber);
+      console.log(`load ${this.name}`, this.loadedNumber);
       const cb = list.length ? this.loadCallback : null;
       this.loadList(list, isReload, cb, ...args);
     }
@@ -37,13 +36,13 @@ $(function () {
       }
       this.renderer(list, ...args);
       // console.log(this.name, this.component[0].scrollHeight, this.component[0].clientHeight);
-      const isContainerFull = this.component[0].scrollHeight > this.component[0].clientHeight;
-      if (!isContainerFull && cb) cb();
+      this.isContainerFull = this.component[0].scrollHeight > this.component[0].clientHeight;
+      if (!this.isContainerFull && cb) cb();
     }
 
     initializeScroll () {
       const intersectionObserver = new IntersectionObserver(entries => {
-        if (this.loadedNumber && !this.isReload && !this.allLoaded &&
+        if (this.isContainerFull && !this.allLoaded &&
           entries[0].isIntersecting && this.scrollCallback) {
           this.scrollCallback();
           // console.log(`emit ${this.name}`);
@@ -58,6 +57,7 @@ $(function () {
       this.socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
       this.view = view;
       this.activeChannel = null;
+      this.isFirstConnect = true;
       this.initialize();
     }
 
@@ -75,13 +75,15 @@ $(function () {
     }
 
     onConnect () {
-      this.initializeScrollComponents();
-      this.initializeChannelChangeEvent();
-      this.initializeMessageSendEvent();
-      this.initializeChannelCreateEvent();
-      this.initializeChannelCreateOpenEvent();
-      this.initializeChannelCreateFormCloseEvent();
-      this.initializeLogoutEvent();
+      if (this.isFirstConnect) {
+        this.initializeScrollComponents();
+        this.initializeChannelChangeEvent();
+        this.initializeMessageSendEvent();
+        this.initializeChannelCreateEvent();
+        this.initializeChannelCreateOpenEvent();
+        this.initializeChannelCreateFormCloseEvent();
+        this.initializeLogoutEvent();
+      }
     }
 
     initializeScrollComponents () {
@@ -117,10 +119,13 @@ $(function () {
     }
 
     onSetActiveChanel (channel) {
-      this.activeChannel = channel;
-      this.socket.emit('joined', this.activeChannel);
-      this.socket.emit('get messages', this.messages.loadedNumber, false);
-      this.socket.emit('get channels', this.channels.loadedNumber);
+      if (this.isFirstConnect) {
+        this.activeChannel = channel;
+        this.socket.emit('joined', this.activeChannel);
+        this.socket.emit('get messages', this.messages.loadedNumber, false);
+        this.socket.emit('get channels', this.channels.loadedNumber);
+        this.isFirstConnect = false;
+      }
     }
 
     initializeChannelChangeEvent () {
