@@ -107,7 +107,7 @@
     {{#each .}}
     <div class="message">
         <span>{{author}}</span>
-        <span>{{timestamp}}</span>
+        <span>{{#date timestamp}}{{/date}}</span>
         <div>{{text}}</div>
     </div>
     {{/each}}

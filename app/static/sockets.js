@@ -236,6 +236,10 @@ $(function () {
       Handlebars.registerHelper('if_eq', function (a, b, opts) {
         return a === b ? opts.fn(this) : opts.inverse(this);
       });
+
+      Handlebars.registerHelper('date', function (date) {
+        return moment.utc(date).local().format('DD/MM/YYYY HH:mm:ss');
+      });
     }
 
     setTopMarginAfterFixedHeaders () {
