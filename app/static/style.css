@@ -40,3 +40,7 @@ input:not([type="hidden"]) + .invalid-feedback {
     background-color: white;
     padding-bottom: 10px;
 }
+
+textarea[name="message"] {
+    resize: none;
+}

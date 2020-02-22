@@ -230,6 +230,7 @@ $(function () {
       this.setTopMarginAfterFixedHeaders();
       this.setChatContainerHeight();
       this.validateSendMessageForm();
+      this.resizeMessageInput();
     }
 
     handlebarsHelpers () {
@@ -331,6 +332,15 @@ $(function () {
     resetSendMessageForm () {
       this.sendMessageForm[0].reset();
       this.sendMessageButton.prop('disabled', true);
+    }
+
+    resizeMessageInput () {
+      const self = this;
+      const offset = this.messageInput[0].offsetHeight - this.messageInput[0].clientHeight;
+      this.messageInput.on('input', function () {
+        $(this).outerHeight('auto').outerHeight(this.scrollHeight + offset);
+        self.messagesSection.scrollTop(self.messagesSection[0].scrollHeight);
+      });
     }
 
     renderMessages (messages, fromSendMessage, fromScrollEvent) {
