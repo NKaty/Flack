@@ -229,6 +229,7 @@ $(function () {
       this.handlebarsHelpers();
       this.setTopMarginAfterFixedHeaders();
       this.setChatContainerHeight();
+      this.onWindowResize();
       this.validateSendMessageForm();
       this.resizeMessageInput();
     }
@@ -254,6 +255,14 @@ $(function () {
         this.flashMessages.outerHeight(true) -
         (parseInt(this.flashMessages.children().last().css('margin-bottom')) || 0);
       this.chatContainer.outerHeight(height);
+    }
+
+    onWindowResize () {
+      const optimizedResize = this.throttle(() => {
+        this.setChatContainerHeight();
+        this.messagesSection.scrollTop(this.messagesSection[0].scrollHeight);
+      }, 150);
+      $(window).on('resize', optimizedResize);
     }
 
     onFlashMessageClosed () {
@@ -396,6 +405,19 @@ $(function () {
     closeFlashMessages (messagesLen) {
       const alerts = this.flashMessages.find('.alert').slice(-messagesLen);
       alerts.each((index, item) => setTimeout(() => $(item).alert('close'), 10000));
+    }
+
+    throttle (func, wait = 250, immediate = false) {
+      let timeout;
+      return (...args) => {
+        const later = () => {
+          timeout = null;
+          if (!immediate) func(...args);
+        };
+        const callNow = immediate && !timeout;
+        if (!timeout) timeout = setTimeout(later, wait);
+        if (callNow) func(...args);
+      };
     }
   }
 

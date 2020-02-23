@@ -51,7 +51,7 @@ class Channel(db.Model):
 
     def get_all_channel_members(self, offset):
         members = self.users.filter_by(is_connected=True).order_by(User.username.asc()).offset(
-            offset).limit(1).all()
+            offset).limit(4).all()
         return [member.username for member in members]
 
     @staticmethod
