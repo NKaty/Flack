@@ -242,6 +242,12 @@ $(function () {
       Handlebars.registerHelper('date', function (date) {
         return moment.utc(date).local().format('DD/MM/YYYY HH:mm:ss');
       });
+
+      Handlebars.registerHelper('breaklines', function (text) {
+        text = Handlebars.Utils.escapeExpression(text);
+        text = text.replace(/(\r\n|\n|\r)/gm, '<br>');
+        return new Handlebars.SafeString(text);
+      });
     }
 
     setTopMarginAfterFixedHeaders () {
