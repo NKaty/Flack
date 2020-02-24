@@ -73,9 +73,11 @@ def joined(channel):
 
 @socketio.on('send message')
 @authenticated_only
-def send_message(text):
+def send_message(data):
     if current_user.channel_id is not None:
-        message = Message(text=text,
+        with open('temp/' + data['file']['name'], 'wb') as f:
+            f.write(data['file']['data'])
+        message = Message(text=data['message'],
                           author=current_user._get_current_object(),
                           channel=current_user.current_channel)
         db.session.add(message)

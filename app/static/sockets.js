@@ -150,9 +150,23 @@ $(function () {
     initializeMessageSendEvent () {
       this.view.sendMessageButton.on('click', () => {
         const message = this.view.messageInput.val();
-        if (this.view.isSendMessageFormValid(message)) {
-          this.socket.emit('send message', message);
-          this.view.resetSendMessageForm();
+        const file = this.view.fileInput.prop('files');
+        if (this.view.isSendMessageFormValid(message, file)) {
+          let fileData = null;
+          if (file.length) {
+            fileData = {size: file[0].size, name: file[0].name};
+            let fileReader = new FileReader();
+            fileReader.onload = (event) => {
+              fileData.data = fileReader.result;
+              this.socket.emit('send message', { message: message, file: fileData });
+              this.view.resetSendMessageForm();
+            };
+            fileReader.onerror = () => {
+              this.view.showFormFieldErrorMessage(this.view.fileInput, 'Error');
+              this.view.fileInput.val('');
+            }
+            fileReader.readAsArrayBuffer(file[0]);
+          }
         }
       });
     }
@@ -203,6 +217,7 @@ $(function () {
       this.submitNewChannelButton = this.createChannelModal.find('#submit');
       this.sendMessageForm = $('#send-message');
       this.messageInput = this.sendMessageForm.find('textarea[name="message"]');
+      this.fileInput = this.sendMessageForm.find('input[name="file"]');
       this.sendMessageButton = this.sendMessageForm.find('button');
       this.flashTemplate = $('#flash-template');
       this.channelsTemplate = $('#channels-template');
@@ -316,8 +331,8 @@ $(function () {
         /^[A-Za-z][A-Za-z0-9_.]*$/.test(channelName);
     }
 
-    isSendMessageFormValid (message) {
-      return message.length > 0;
+    isSendMessageFormValid (message, files) {
+      return message.length > 0 || files.length > 0;
     }
 
     channelCreateFormOpen () {
@@ -339,8 +354,9 @@ $(function () {
     }
 
     validateSendMessageForm () {
-      this.messageInput.on('keyup', () => {
-        this.sendMessageButton.prop('disabled', !this.isSendMessageFormValid(this.messageInput.val()));
+      this.sendMessageForm.on('input',() => {
+        const disabled = !this.isSendMessageFormValid(this.messageInput.val(), this.fileInput.prop('files'));
+        this.sendMessageButton.prop('disabled', disabled);
       });
     }
 
