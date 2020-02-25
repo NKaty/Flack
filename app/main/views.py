@@ -7,7 +7,7 @@ from flask_socketio import emit, join_room, leave_room
 from . import main
 from .socket_auth_helper import authenticated_only
 from .. import db
-from ..models import User, Channel, Message
+from ..models import User, Channel, Message, File
 from app import socketio
 
 
@@ -75,11 +75,15 @@ def joined(channel):
 @authenticated_only
 def send_message(data):
     if current_user.channel_id is not None:
-        with open('temp/' + data['file']['name'], 'wb') as f:
-            f.write(data['file']['data'])
-        message = Message(text=data['message'],
-                          author=current_user._get_current_object(),
-                          channel=current_user.current_channel)
+        message_dict = {
+            'text': data['message'],
+            'author': current_user._get_current_object(),
+            'channel': current_user.current_channel,
+        }
+        if data['file'] is not None:
+            message_dict['file'] = File(name=data['file']['name'], content=data['file']['content'])
+            db.session.add(message_dict['file'])
+        message = Message(**message_dict)
         db.session.add(message)
         db.session.commit()
         emit('load messages',
@@ -101,7 +105,7 @@ def create_channel(channel):
         new_channel = Channel(name=channel)
         db.session.add(new_channel)
         db.session.commit()
-        print('create channel emit')
+        # print('create channel emit')
         emit('load channels', {'channels': Channel.get_all_channels(offset=0), 'isReload': True},
              broadcast=True)
         emit('flash',

@@ -157,7 +157,7 @@ $(function () {
             fileData = {size: file[0].size, name: file[0].name};
             let fileReader = new FileReader();
             fileReader.onload = (event) => {
-              fileData.data = fileReader.result;
+              fileData.content = fileReader.result;
               this.socket.emit('send message', { message: message, file: fileData });
               this.view.resetSendMessageForm();
             };

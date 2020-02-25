@@ -112,6 +112,12 @@
         <span>{{author}}</span>
         <span>{{date timestamp}}</span>
         <div>{{breaklines text}}</div>
+        {{#if file}}
+        <div data-file_id="{{file.id}}">
+            <div>{{file.name}}</div>
+            <button class="btn btn-secondary">Download</button>
+        </div>
+        {{/if}}
     </div>
     {{/each}}
 </script>
