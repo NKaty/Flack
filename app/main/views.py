@@ -91,6 +91,13 @@ def send_message(data):
              room=message.channel.name)
 
 
+@socketio.on('download file')
+@authenticated_only
+def download_file(file_id):
+    file = File.query.filter_by(id=file_id).first()
+    return {'fileName': file.name, 'fileContent': file.content}
+
+
 @socketio.on('create channel')
 @authenticated_only
 def create_channel(channel):

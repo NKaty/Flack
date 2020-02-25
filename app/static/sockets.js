@@ -79,6 +79,7 @@ $(function () {
         this.initializeScrollComponents();
         this.initializeChannelChangeEvent();
         this.initializeMessageSendEvent();
+        this.initializeDownloadFileEvent();
         this.initializeChannelCreateEvent();
         this.initializeChannelCreateOpenEvent();
         this.initializeChannelCreateFormCloseEvent();
@@ -154,6 +155,7 @@ $(function () {
         if (this.view.isSendMessageFormValid(message, file)) {
           let fileData = null;
           if (file.length) {
+            console.log(file[0])
             fileData = {size: file[0].size, name: file[0].name};
             let fileReader = new FileReader();
             fileReader.onload = (event) => {
@@ -168,6 +170,16 @@ $(function () {
             fileReader.readAsArrayBuffer(file[0]);
           }
         }
+      });
+    }
+
+    initializeDownloadFileEvent () {
+      const self = this;
+      this.view.messages.on('click', '.download', function() {
+        self.socket.emit('download file', $(this).data('file_id'), data => {
+          const blob = new Blob([data.fileContent]);
+          saveAs(blob, data.fileName);
+        })
       });
     }
 

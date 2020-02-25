@@ -113,9 +113,9 @@
         <span>{{date timestamp}}</span>
         <div>{{breaklines text}}</div>
         {{#if file}}
-        <div data-file_id="{{file.id}}">
+        <div>
             <div>{{file.name}}</div>
-            <button class="btn btn-secondary">Download</button>
+            <button class="download btn btn-secondary" data-file_id="{{file.id}}">Download</button>
         </div>
         {{/if}}
     </div>
@@ -131,5 +131,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.3/handlebars.min.js"></script>
 <script src="https://polyfill.io/v3/polyfill.min.js?features=IntersectionObserver"></script>
+<script src="{{ url_for('static', filename='FileSaver.min.js') }}"></script>
 <script src="{{ url_for('static', filename='sockets.js') }}"></script>
 {% endblock %}
