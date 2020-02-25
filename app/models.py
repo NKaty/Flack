@@ -45,7 +45,6 @@ class Channel(db.Model):
     messages = db.relationship('Message', backref='channel', lazy='dynamic')
 
     def get_all_channel_messages(self, offset):
-        print('offset', offset)
         messages = self.messages.order_by(Message.timestamp.desc()).offset(offset).limit(20).all()
         return [message.to_json() for message in messages[::-1]]
 
@@ -70,13 +69,26 @@ class Message(db.Model):
     timestamp = db.Column(db.DateTime, nullable=False, index=True, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     channel_id = db.Column(db.Integer, db.ForeignKey('channels.id'), nullable=False)
+    file_id = db.Column(db.Integer, db.ForeignKey('files.id'))
+    file = db.relationship('File', backref=db.backref('message', uselist=False), lazy='joined')
 
     def to_json(self):
         return {
             'text': self.text,
+            'file': {'id': self.file_id, 'name': self.file.name} if self.file_id else None,
             'author': self.author.username,
             'timestamp': self.timestamp.strftime('%Y-%m-%d %H:%M:%S')
         }
 
     def __repr__(self):
         return f'<Message {self.text} channel {self.channel.name} author {self.author.username}>'
+
+
+class File(db.Model):
+    __tablename__ = 'files'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(300), nullable=False)
+    content = db.Column(db.LargeBinary)
+
+    def __repr__(self):
+        return f'<File {self.name}>'
