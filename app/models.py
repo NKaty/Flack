@@ -88,6 +88,7 @@ class File(db.Model):
     __tablename__ = 'files'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(300), nullable=False)
+    type = db.Column(db.String(128))
     content = db.Column(db.LargeBinary)
 
     def __repr__(self):
