@@ -91,5 +91,12 @@ class File(db.Model):
     type = db.Column(db.String(128))
     content = db.Column(db.LargeBinary)
 
+    def to_json(self):
+        return {
+            'name': self.name,
+            'type': self.type,
+            'content': self.content
+        }
+
     def __repr__(self):
         return f'<File {self.name}>'

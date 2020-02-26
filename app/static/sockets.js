@@ -155,8 +155,7 @@ $(function () {
         if (this.view.isSendMessageFormValid(message, file)) {
           let fileData = null;
           if (file.length) {
-            console.log(file[0])
-            fileData = {size: file[0].size, name: file[0].name};
+            fileData = { size: file[0].size, name: file[0].name, type: file[0].type };
             let fileReader = new FileReader();
             fileReader.onload = (event) => {
               fileData.content = fileReader.result;
@@ -166,7 +165,7 @@ $(function () {
             fileReader.onerror = () => {
               this.view.showFormFieldErrorMessage(this.view.fileInput, 'Error');
               this.view.fileInput.val('');
-            }
+            };
             fileReader.readAsArrayBuffer(file[0]);
           }
         }
@@ -175,11 +174,15 @@ $(function () {
 
     initializeDownloadFileEvent () {
       const self = this;
-      this.view.messages.on('click', '.download', function() {
+      this.view.messages.on('click', '.download', function () {
         self.socket.emit('download file', $(this).data('file_id'), data => {
-          const blob = new Blob([data.fileContent]);
-          saveAs(blob, data.fileName);
-        })
+          if (data) {
+            const options = {};
+            if (data.type) options.type = data.type;
+            const blob = new Blob([data.content], options);
+            saveAs(blob, data.name);
+          }
+        });
       });
     }
 
@@ -366,7 +369,7 @@ $(function () {
     }
 
     validateSendMessageForm () {
-      this.sendMessageForm.on('input',() => {
+      this.sendMessageForm.on('input', () => {
         const disabled = !this.isSendMessageFormValid(this.messageInput.val(), this.fileInput.prop('files'));
         this.sendMessageButton.prop('disabled', disabled);
       });

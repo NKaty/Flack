@@ -81,7 +81,9 @@ def send_message(data):
             'channel': current_user.current_channel,
         }
         if data['file'] is not None:
-            message_dict['file'] = File(name=data['file']['name'], content=data['file']['content'])
+            file = data['file']
+            message_dict['file'] = File(name=file['name'], content=file['content'],
+                                        type=file['type'] if len(file['type']) else None)
             db.session.add(message_dict['file'])
         message = Message(**message_dict)
         db.session.add(message)
@@ -94,8 +96,11 @@ def send_message(data):
 @socketio.on('download file')
 @authenticated_only
 def download_file(file_id):
-    file = File.query.filter_by(id=file_id).first()
-    return {'fileName': file.name, 'fileContent': file.content}
+    file = File.query.get(file_id)
+    if file:
+        return file.to_json()
+    emit('flash', [{'message': 'File does not exists.', 'category': 'danger'}])
+    return None
 
 
 @socketio.on('create channel')
