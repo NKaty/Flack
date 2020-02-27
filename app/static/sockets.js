@@ -191,14 +191,9 @@ $(function () {
     initializeChannelCreateEvent () {
       this.view.submitNewChannelButton.on('click', () => {
         const channel = this.view.channelInput.val();
-        if (this.view.isChannelCreateFormValid(channel)) {
+        if (this.view.isChannelCreateFormValid(channel).isValid) {
           this.socket.emit('create channel', channel);
           this.view.createChannelModal.modal('hide');
-        } else {
-          this.view.showFormFieldErrorMessage(
-            this.view.channelInput,
-            'Channel name must be between 1 and 64 characters long and have only letters, numbers, dots or underscores.'
-          );
         }
       });
     }
@@ -345,8 +340,12 @@ $(function () {
     }
 
     isChannelCreateFormValid (channelName) {
-      return channelName.length > 0 && channelName.length < 65 &&
+      let isValid = channelName.length > 0 && channelName.length < 65 &&
         /^[A-Za-z][A-Za-z0-9_.]*$/.test(channelName);
+      return {
+        isValid: isValid,
+        error: isValid ? '' : 'Channel name must be between 1 and 64 characters long and have only letters, numbers, dots or underscores.'
+      };
     }
 
     isSendMessageFormValid (message, files) {
@@ -371,7 +370,10 @@ $(function () {
         this.channelInput.focus();
         this.submitNewChannelButton.prop('disabled', true);
         this.channelInput.on('keyup', () => {
-          this.submitNewChannelButton.prop('disabled', this.channelInput.val().length < 1);
+          const validation = this.isChannelCreateFormValid(this.channelInput.val());
+          this.submitNewChannelButton.prop('disabled', !validation.isValid);
+          if (validation.error) this.showFormFieldErrorMessage(this.channelInput, validation.error);
+          else this.removeFormFieldErrorMessage(this.channelInput);
         });
       });
     }
