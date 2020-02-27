@@ -152,7 +152,7 @@ $(function () {
       this.view.sendMessageButton.on('click', () => {
         const message = this.view.messageInput.val();
         const file = this.view.fileInput.prop('files');
-        if (this.view.isSendMessageFormValid(message, file)) {
+        if (this.view.isSendMessageFormValid(message, file).isValid) {
           let fileData = null;
           if (file.length) {
             fileData = { size: file[0].size, name: file[0].name, type: file[0].type };
@@ -164,7 +164,6 @@ $(function () {
             };
             fileReader.onerror = () => {
               this.view.showFormFieldErrorMessage(this.view.fileInput, 'Error');
-              this.view.fileInput.val('');
             };
             fileReader.readAsArrayBuffer(file[0]);
           }
@@ -249,6 +248,7 @@ $(function () {
       this.channelsSentinel = $('#channels-sentinel');
       this.membersSentinel = $('#members-sentinel');
       this.messagesSentinel = $('#messages-sentinel');
+      this.maxumumFileSize = 5 * 1024 * 1024;
       this.renderChannels = this.renderChannels.bind(this);
       this.renderMembers = this.renderMembers.bind(this);
       this.renderMessages = this.renderMessages.bind(this);
@@ -347,7 +347,20 @@ $(function () {
     }
 
     isSendMessageFormValid (message, files) {
-      return message.length > 0 || files.length > 0;
+      let errors = [];
+      let isValid = message.length > 0 || files.length > 0;
+      if (files.length > 0) {
+        if (files[0].name.length < 1) {
+          isValid = false;
+          errors.push('File must have a name.');
+        }
+        if (files[0].size > this.maxumumFileSize) {
+          isValid = false;
+          const size = this.maxumumFileSize / Math.pow(1024,2).toFixed(1);
+          errors.push(`File exceeded maximum size ${size}MB.`);
+        }
+      }
+      return { isValid: isValid, error: errors.length ? errors.join(' ') : '' };
     }
 
     channelCreateFormOpen () {
@@ -370,8 +383,10 @@ $(function () {
 
     validateSendMessageForm () {
       this.sendMessageForm.on('input', () => {
-        const disabled = !this.isSendMessageFormValid(this.messageInput.val(), this.fileInput.prop('files'));
-        this.sendMessageButton.prop('disabled', disabled);
+        const validation = this.isSendMessageFormValid(this.messageInput.val(), this.fileInput.prop('files'));
+        this.sendMessageButton.prop('disabled', !validation.isValid);
+        if (validation.error) this.showFormFieldErrorMessage(this.fileInput, validation.error);
+        else this.removeFormFieldErrorMessage(this.fileInput);
       });
     }
 
