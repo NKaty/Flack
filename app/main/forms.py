@@ -1,6 +1,7 @@
 from flask import current_app
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, BooleanField
+from wtforms.validators import DataRequired, Length, Regexp
 from wtforms import ValidationError
 
 
@@ -33,3 +34,14 @@ class MessageForm(FlaskForm):
                 size = round(current_app.config["MAX_CONTENT_LENGTH"] / pow(1024, 2), 1)
                 raise ValidationError(
                     f'File exceeded maximum size {size}MB. Upload rejected by server.')
+
+
+class CreateChannelForm(FlaskForm):
+    class Meta:
+        csrf = False
+
+    name = StringField('Channel name',
+                       validators=[DataRequired(), Length(1, 64),
+                                   Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,
+                                          'Channel name must have only letters, numbers, '
+                                          'dots or underscores.')])

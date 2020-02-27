@@ -8,7 +8,7 @@ from . import main
 from .socket_auth_helper import authenticated_only
 from .. import db
 from ..models import User, Channel, Message, File
-from .forms import MessageForm
+from .forms import MessageForm, CreateChannelForm
 from app import socketio
 
 
@@ -95,7 +95,8 @@ def send_message(data):
                  {'messages': [message.to_json()], 'fromSendMessage': True,
                   'fromScrollEvent': False}, room=message.channel.name)
         else:
-            emit('flash', [{'message': err, 'category': 'danger'} for err in form.errors.values()])
+            emit('flash',
+                 [{'message': ' '.join(err), 'category': 'danger'} for err in form.errors.values()])
 
 
 @socketio.on('download file')
@@ -111,18 +112,16 @@ def download_file(file_id):
 @socketio.on('create channel')
 @authenticated_only
 def create_channel(channel):
-    if len(channel) < 1 or len(channel) > 64 or not re.fullmatch('^[A-Za-z][A-Za-z0-9_.]*$',
-                                                                 channel):
-        emit('flash', [{'message': 'Channel name must be between 1 and 64 characters long and '
-                                   'have only letters, numbers, dots or underscores.',
-                        'category': 'danger'}])
+    form = CreateChannelForm(name=channel)
+    if not form.validate():
+        emit('flash',
+             [{'message': ' '.join(err), 'category': 'danger'} for err in form.errors.values()])
     elif Channel.query.filter_by(name=channel).first():
         emit('flash', [{'message': 'Channel with this name already exists.', 'category': 'danger'}])
     else:
         new_channel = Channel(name=channel)
         db.session.add(new_channel)
         db.session.commit()
-        # print('create channel emit')
         emit('load channels', {'channels': Channel.get_all_channels(offset=0), 'isReload': True},
              broadcast=True)
         emit('flash',

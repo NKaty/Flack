@@ -453,6 +453,7 @@ $(function () {
     showFlashMessages (messages) {
       const template = Handlebars.compile(this.flashTemplate.html());
       const html = template(messages);
+      console.log(messages);
       this.flashMessages.append(html);
       this.setChatContainerHeight();
       this.messagesSection.scrollTop(this.messagesSection[0].scrollHeight);
