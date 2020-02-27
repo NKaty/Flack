@@ -163,9 +163,12 @@ $(function () {
               this.view.resetSendMessageForm();
             };
             fileReader.onerror = () => {
-              this.view.showFormFieldErrorMessage(this.view.fileInput, 'Error');
+              this.view.showFormFieldErrorMessage(this.view.fileInput, 'Error occurred while uploading the file.');
             };
             fileReader.readAsArrayBuffer(file[0]);
+          } else {
+            this.socket.emit('send message', { message: message, file: {} });
+            this.view.resetSendMessageForm();
           }
         }
       });
@@ -356,7 +359,7 @@ $(function () {
         }
         if (files[0].size > this.maxumumFileSize) {
           isValid = false;
-          const size = this.maxumumFileSize / Math.pow(1024,2).toFixed(1);
+          const size = this.maxumumFileSize / Math.pow(1024, 2).toFixed(1);
           errors.push(`File exceeded maximum size ${size}MB.`);
         }
       }
@@ -450,6 +453,7 @@ $(function () {
       const html = template(messages);
       this.flashMessages.append(html);
       this.setChatContainerHeight();
+      this.messagesSection.scrollTop(this.messagesSection[0].scrollHeight);
       this.onFlashMessageClosed();
       this.closeFlashMessages(messages.length);
     }

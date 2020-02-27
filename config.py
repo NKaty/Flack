@@ -8,6 +8,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SESSION_PERMANENT = False
     SESSION_TYPE = 'filesystem'
+    MAX_CONTENT_LENGTH = 5 * 1024 * 1024
 
 
 class DevelopmentConfig(Config):

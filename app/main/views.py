@@ -8,6 +8,7 @@ from . import main
 from .socket_auth_helper import authenticated_only
 from .. import db
 from ..models import User, Channel, Message, File
+from .forms import MessageForm
 from app import socketio
 
 
@@ -75,22 +76,26 @@ def joined(channel):
 @authenticated_only
 def send_message(data):
     if current_user.channel_id is not None:
-        message_dict = {
-            'text': data['message'],
-            'author': current_user._get_current_object(),
-            'channel': current_user.current_channel,
-        }
-        if data['file'] is not None:
-            file = data['file']
-            message_dict['file'] = File(name=file['name'], content=file['content'],
-                                        type=file['type'] if len(file['type']) else None)
-            db.session.add(message_dict['file'])
-        message = Message(**message_dict)
-        db.session.add(message)
-        db.session.commit()
-        emit('load messages',
-             {'messages': [message.to_json()], 'fromSendMessage': True, 'fromScrollEvent': False},
-             room=message.channel.name)
+        form = MessageForm(text=data['message'], file=bool(data['file']), **data['file'])
+        if form.validate():
+            message_dict = {
+                'text': data['message'],
+                'author': current_user._get_current_object(),
+                'channel': current_user.current_channel,
+            }
+            if bool(data['file']):
+                file = data['file']
+                message_dict['file'] = File(name=file['name'], content=file['content'],
+                                            type=file['type'] if len(file['type']) else None)
+                db.session.add(message_dict['file'])
+            message = Message(**message_dict)
+            db.session.add(message)
+            db.session.commit()
+            emit('load messages',
+                 {'messages': [message.to_json()], 'fromSendMessage': True,
+                  'fromScrollEvent': False}, room=message.channel.name)
+        else:
+            emit('flash', [{'message': err, 'category': 'danger'} for err in form.errors.values()])
 
 
 @socketio.on('download file')
