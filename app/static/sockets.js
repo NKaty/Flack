@@ -135,7 +135,7 @@ $(function () {
         if (self.view.isChannelActive(this)) return;
         self.resetAtChannelChanged();
         self.socket.emit('left', self.activeChannel);
-        self.activeChannel = self.view.getDataAttribute(this, 'channel');
+        self.activeChannel = self.view.getDataAttributeChannel(this);
         self.socket.emit('joined', self.activeChannel);
         self.socket.emit('get messages', self.messages.loadedNumber, false);
         self.view.setChannelActive(this);
@@ -152,10 +152,9 @@ $(function () {
       this.view.sendMessageButton.on('click', () => {
         const message = this.view.messageInput.val();
         const file = this.view.fileInput.prop('files');
-        if (this.view.isSendMessageFormValid(message, file).isValid) {
-          let fileData = null;
+        if (this.view.checkSendMessageForm(message, file).isValid) {
           if (file.length) {
-            fileData = { size: file[0].size, name: file[0].name, type: file[0].type };
+            let fileData = { size: file[0].size, name: file[0].name, type: file[0].type };
             let fileReader = new FileReader();
             fileReader.onload = (event) => {
               fileData.content = fileReader.result;
@@ -176,8 +175,8 @@ $(function () {
 
     initializeDownloadFileEvent () {
       const self = this;
-      this.view.messages.on('click', '.download', function () {
-        self.socket.emit('download file', $(this).data('file_id'), data => {
+      this.view.messages.on('click', this.view.downloadButtonClass, function () {
+        self.socket.emit('download file', self.view.getDataAttributeFile(this), data => {
           if (data) {
             const options = {};
             if (data.type) options.type = data.type;
@@ -191,7 +190,7 @@ $(function () {
     initializeChannelCreateEvent () {
       this.view.submitNewChannelButton.on('click', () => {
         const channel = this.view.channelInput.val();
-        if (this.view.isChannelCreateFormValid(channel).isValid) {
+        if (this.view.checkChannelCreateForm(channel).isValid) {
           this.socket.emit('create channel', channel);
           this.view.createChannelModal.modal('hide');
         }
@@ -230,6 +229,7 @@ $(function () {
       this.sendMessageForm = $('#send-message');
       this.messageInput = this.sendMessageForm.find('textarea[name="message"]');
       this.fileInput = this.sendMessageForm.find('input[name="file"]');
+      this.downloadButtonClass = '.download';
       this.sendMessageButton = this.sendMessageForm.find('button');
       this.flashTemplate = $('#flash-template');
       this.channelsTemplate = $('#channels-template');
@@ -335,11 +335,15 @@ $(function () {
       $(channel).addClass('active').siblings().removeClass('active');
     }
 
-    getDataAttribute (elem, attr) {
-      return $(elem).data(attr);
+    getDataAttributeChannel (elem) {
+      return $(elem).data('channel');
     }
 
-    isChannelCreateFormValid (channelName) {
+    getDataAttributeFile (elem) {
+      return $(elem).data('file_id');
+    }
+
+    checkChannelCreateForm (channelName) {
       let isValid = channelName.length > 0 && channelName.length < 65 &&
         /^[A-Za-z][A-Za-z0-9_.]*$/.test(channelName);
       return {
@@ -348,13 +352,17 @@ $(function () {
       };
     }
 
-    isSendMessageFormValid (message, files) {
+    checkSendMessageForm (message, files) {
       let errors = [];
       let isValid = message.length > 0 || files.length > 0;
       if (files.length > 0) {
         if (files[0].name.length < 1) {
           isValid = false;
           errors.push('File must have a name.');
+        }
+        if (!files[0].size) {
+          isValid = false;
+          errors.push('File size is unknown or 0.');
         }
         if (files[0].size > this.maxumumFileSize) {
           isValid = false;
@@ -370,7 +378,7 @@ $(function () {
         this.channelInput.focus();
         this.submitNewChannelButton.prop('disabled', true);
         this.channelInput.on('keyup', () => {
-          const validation = this.isChannelCreateFormValid(this.channelInput.val());
+          const validation = this.checkChannelCreateForm(this.channelInput.val());
           this.submitNewChannelButton.prop('disabled', !validation.isValid);
           if (validation.error) this.showFormFieldErrorMessage(this.channelInput, validation.error);
           else this.removeFormFieldErrorMessage(this.channelInput);
@@ -388,7 +396,7 @@ $(function () {
 
     validateSendMessageForm () {
       this.sendMessageForm.on('input', () => {
-        const validation = this.isSendMessageFormValid(this.messageInput.val(), this.fileInput.prop('files'));
+        const validation = this.checkSendMessageForm(this.messageInput.val(), this.fileInput.prop('files'));
         this.sendMessageButton.prop('disabled', !validation.isValid);
         if (validation.error) this.showFormFieldErrorMessage(this.fileInput, validation.error);
         else this.removeFormFieldErrorMessage(this.fileInput);
@@ -453,7 +461,6 @@ $(function () {
     showFlashMessages (messages) {
       const template = Handlebars.compile(this.flashTemplate.html());
       const html = template(messages);
-      console.log(messages);
       this.flashMessages.append(html);
       this.setChatContainerHeight();
       this.messagesSection.scrollTop(this.messagesSection[0].scrollHeight);

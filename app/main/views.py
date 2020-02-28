@@ -105,7 +105,7 @@ def download_file(file_id):
     file = File.query.get(file_id)
     if file:
         return file.to_json()
-    emit('flash', [{'message': 'File does not exists.', 'category': 'danger'}])
+    emit('flash', [{'message': 'File does not exist.', 'category': 'danger'}])
     return None
 
 
