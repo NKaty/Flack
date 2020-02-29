@@ -10,5 +10,12 @@ def authenticated_only(f):
             disconnect()
         else:
             return f(*args, **kwargs)
+    return wrapped
 
+
+def update_last_seen(f):
+    @functools.wraps(f)
+    def wrapped(*args, **kwargs):
+        current_user.ping()
+        return f(*args, **kwargs)
     return wrapped

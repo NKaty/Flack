@@ -122,11 +122,11 @@ $(function () {
     onSetActiveChanel (channel) {
       if (this.isFirstConnect) {
         this.activeChannel = channel;
-        this.socket.emit('joined', this.activeChannel);
         this.socket.emit('get messages', this.messages.loadedNumber, false);
         this.socket.emit('get channels', this.channels.loadedNumber);
         this.isFirstConnect = false;
       }
+      this.socket.emit('joined', this.activeChannel);
     }
 
     initializeChannelChangeEvent () {
@@ -267,8 +267,8 @@ $(function () {
         return a === b ? opts.fn(this) : opts.inverse(this);
       });
 
-      Handlebars.registerHelper('date', function (date) {
-        return moment.utc(date).local().format('DD/MM/YYYY HH:mm:ss');
+      Handlebars.registerHelper('date', function (date, method, ...args) {
+        return moment.utc(date).local()[method](...args);
       });
 
       Handlebars.registerHelper('breaklines', function (text) {
