@@ -5,10 +5,15 @@ from wtforms.validators import DataRequired, Length, Regexp
 from wtforms import ValidationError
 
 
-class MessageForm(FlaskForm):
+class CustomForm(FlaskForm):
     class Meta:
         csrf = False
 
+    def get_form_error_messages(self):
+        return [{'message': ' '.join(err), 'category': 'danger'} for err in self.errors.values()]
+
+
+class MessageForm(CustomForm):
     text = TextAreaField('Text')
     file = BooleanField('File')
     name = StringField('File name')
@@ -45,10 +50,7 @@ class MessageForm(FlaskForm):
                 raise ValidationError("Upload rejected by server.")
 
 
-class CreateChannelForm(FlaskForm):
-    class Meta:
-        csrf = False
-
+class CreateChannelForm(CustomForm):
     name = StringField('Channel name',
                        validators=[DataRequired(), Length(1, 64),
                                    Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,

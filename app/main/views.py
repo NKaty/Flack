@@ -76,7 +76,7 @@ def send_message(data):
         form = MessageForm(text=data['message'], file=bool(data['file']), **data['file'])
         if form.validate():
             message_dict = {
-                'text': data['message'],
+                'text': data['message'] if len(data['message']) else None,
                 'author': current_user._get_current_object(),
                 'channel': current_user.current_channel,
             }
@@ -92,8 +92,7 @@ def send_message(data):
                  {'messages': [message.to_json()], 'fromSendMessage': True,
                   'fromScrollEvent': False}, room=message.channel.name)
         else:
-            emit('flash',
-                 [{'message': ' '.join(err), 'category': 'danger'} for err in form.errors.values()])
+            emit('flash', form.get_form_error_messages())
 
 
 @socketio.on('download file')
@@ -109,8 +108,7 @@ def download_file(file_id):
 def create_channel(channel):
     form = CreateChannelForm(name=channel)
     if not form.validate():
-        emit('flash',
-             [{'message': ' '.join(err), 'category': 'danger'} for err in form.errors.values()])
+        emit('flash', form.get_form_error_messages())
     elif Channel.query.filter_by(name=channel).first():
         emit('flash', [{'message': 'Channel with this name already exists.', 'category': 'danger'}])
     else:
