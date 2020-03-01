@@ -110,7 +110,7 @@
     {{#each .}}
     <div class="message">
         <span>{{author}}</span>
-        <span>{{date timestamp}}</span>
+        <span>{{date timestamp 'format' 'DD/MM/YYYY HH:mm:ss'}}</span>
         <div>{{breaklines text}}</div>
         {{#if file}}
         <div>

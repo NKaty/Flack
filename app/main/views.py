@@ -1,13 +1,11 @@
-import re
-
-from flask import render_template, request
+from flask import render_template
 from flask_login import login_required, current_user
 from flask_socketio import emit, join_room, leave_room
 
 from . import main
-from .socket_auth_helper import authenticated_only
+from .socket_decorators import authenticated_only
 from .. import db
-from ..models import User, Channel, Message, File
+from ..models import Channel, Message, File
 from .forms import MessageForm, CreateChannelForm
 from app import socketio
 
@@ -36,7 +34,6 @@ def connect():
 @socketio.on('disconnect')
 @authenticated_only
 def disconnect():
-    # doesn't occur if user close the tab
     current_user.is_connected = False
     db.session.add(current_user._get_current_object())
     db.session.commit()
@@ -100,7 +97,6 @@ def send_message(data):
 
 
 @socketio.on('download file')
-@authenticated_only
 def download_file(file_id):
     file = File.query.get(file_id)
     if file:
@@ -110,7 +106,6 @@ def download_file(file_id):
 
 
 @socketio.on('create channel')
-@authenticated_only
 def create_channel(channel):
     form = CreateChannelForm(name=channel)
     if not form.validate():

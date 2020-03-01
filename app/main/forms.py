@@ -1,6 +1,6 @@
 from flask import current_app
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, BooleanField, FileField
+from wtforms import TextAreaField, StringField, IntegerField, BooleanField, FileField
 from wtforms.validators import DataRequired, Length, Regexp
 from wtforms import ValidationError
 
@@ -9,7 +9,7 @@ class MessageForm(FlaskForm):
     class Meta:
         csrf = False
 
-    text = StringField('Text')
+    text = TextAreaField('Text')
     file = BooleanField('File')
     name = StringField('File name')
     size = IntegerField('File size')
