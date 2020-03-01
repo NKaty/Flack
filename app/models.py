@@ -12,7 +12,6 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(64), nullable=False, unique=True, index=True)
     username = db.Column(db.String(64), nullable=False, unique=True)
     password_hash = db.Column(db.String(128), nullable=False)
-    last_seen = db.Column(db.DateTime(), nullable=False, default=datetime.utcnow)
     channel_id = db.Column(db.Integer, db.ForeignKey('channels.id'))
     is_connected = db.Column(db.Boolean, default=False, nullable=False)
     messages = db.relationship('Message', backref='author', lazy='dynamic')
@@ -65,7 +64,7 @@ class Channel(db.Model):
 class Message(db.Model):
     __tablename__ = 'messages'
     id = db.Column(db.Integer, primary_key=True)
-    text = db.Column(db.Text, nullable=False)
+    text = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, nullable=False, index=True, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     channel_id = db.Column(db.Integer, db.ForeignKey('channels.id'), nullable=False)
