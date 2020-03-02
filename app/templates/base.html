@@ -1,71 +1,79 @@
-{% extends "bootstrap/base.html" %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block title %}Chat{% endblock %}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-{% block head %}
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
-{% endblock %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-{% block navbar %}
-<nav id="navbar" class="navbar navbar-expand-sm navbar-dark bg-dark mb-3">
-    <a class="navbar-brand mb-0 h1" href="{{ url_for('main.index') }}">Flack</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-menu"
-            aria-controls="auth" aria-expanded="false">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="nav-menu">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item {{ 'active' if request.path == url_for('main.index') else '' }}">
-                <a class="nav-link" href="{{ url_for('main.index') }}">Home</a>
-            </li>
+    <title>{% block title %}{% endblock %}Chat</title>
+</head>
+
+<body class="d-flex flex-column">
+    <nav id="navbar" class="navbar navbar-expand-sm navbar-dark bg-dark mb-3">
+        <a class="navbar-brand mb-0 h1" href="{{ url_for('main.index') }}">Flack</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-menu"
+                aria-controls="auth" aria-expanded="false">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="nav-menu">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item {{ 'active' if request.path == url_for('main.index') else '' }}">
+                    <a class="nav-link" href="{{ url_for('main.index') }}">Home</a>
+                </li>
+                {% if session.user_id %}
+                <li class="nav-item {{ 'active' if request.path == url_for('main.channels') else '' }}">
+                    <a class="nav-link" href="{{ url_for('main.channels') }}">Chat</a>
+                </li>
+                {% endif %}
+            </ul>
             {% if session.user_id %}
-            <li class="nav-item {{ 'active' if request.path == url_for('main.channels') else '' }}">
-                <a class="nav-link" href="{{ url_for('main.channels') }}">Chat</a>
-            </li>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <span class="navbar-text">{{ session.username }}</span>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="logout" href="{{ url_for('auth.logout') }}">Log out</a>
+                </li>
+            </ul>
+            {% else %}
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item {{ 'active' if request.path == url_for('auth.login') else '' }}">
+                    <a class="nav-link" href="{{ url_for('auth.login') }}">Log in</a>
+                </li>
+                <li class="nav-item {{ 'active' if request.path == url_for('auth.signup') else '' }}">
+                    <a class="nav-link" href="{{ url_for('auth.signup') }}">Sign up</a>
+                </li>
+            </ul>
             {% endif %}
-        </ul>
-        {% if session.user_id %}
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <span class="navbar-text">{{ session.username }}</span>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="logout" href="{{ url_for('auth.logout') }}">Log out</a>
-            </li>
-        </ul>
-        {% else %}
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item {{ 'active' if request.path == url_for('auth.login') else '' }}">
-                <a class="nav-link" href="{{ url_for('auth.login') }}">Log in</a>
-            </li>
-            <li class="nav-item {{ 'active' if request.path == url_for('auth.signup') else '' }}">
-                <a class="nav-link" href="{{ url_for('auth.signup') }}">Sign up</a>
-            </li>
-        </ul>
-        {% endif %}
-    </div>
-</nav>
-{% endblock %}
-
-{% block content %}
-<main class="container">
-    <div id="flash-messages">
-        {% for message in get_flashed_messages(True) %}
-        <div class="alert alert-{{ message[0] }} alert-dismissible fade show" role="alert">
-            {{ message[1] }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
         </div>
-        {% endfor %}
-    </div>
+    </nav>
 
-    {% block page_content %}{% endblock %}
-</main>
-{% endblock %}
+    <main class="container">
+        <div id="flash-messages">
+            {% for message in get_flashed_messages(True) %}
+            <div class="alert alert-{{ message[0] }} alert-dismissible fade show" role="alert">
+                {{ message[1] }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+        </div>
 
-{% block scripts %}
-{{ super() }}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
-{% endblock %}
+        {% block page_content %}{% endblock %}
+    </main>
+
+    {% block scripts %}
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+            integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+            integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+            crossorigin="anonymous"></script>
+    {% endblock %}
+</body>
+</html>

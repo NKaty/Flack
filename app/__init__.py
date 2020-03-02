@@ -1,5 +1,4 @@
 from flask import Flask
-from flask_bootstrap import Bootstrap
 from flask_login import LoginManager
 from flask_session import Session
 from flask_socketio import SocketIO
@@ -7,8 +6,6 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 
 from config import config
-
-bootstrap = Bootstrap()
 
 naming_convention = {
     "ix": 'ix_%(column_0_label)s',
@@ -31,7 +28,6 @@ def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
 
-    bootstrap.init_app(app)
     db.init_app(app)
     login_manager.init_app(app)
     session.init_app(app)
