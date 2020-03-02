@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Error - {% endblock %}
+
+{% block page_content %}
+
+<div class="error-content text-center mt-n3">
+    <h2 class="text-secondary mb-3">An unexpected error has occurred.</h2>
+    <h3 class="text-secondary">Sorry for the inconvenience!</h3>
+    <p class="mt-4">
+        <a class="text-decoration-none btn btn-info" href="{{ url_for('index') }}">Return to the homepage</a>
+    </p>
+</div>
+
+{% endblock %}
