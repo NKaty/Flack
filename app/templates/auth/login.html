@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% import "bootstrap/wtf.html" as wtf %}
+{% from "auth/_macros.html" import displayInputField, displayCheckField, displaySubmitButton %}
 
 {% block title %}Login - Chat{% endblock %}
 
@@ -7,7 +7,13 @@
 <div class="text-center my-5">
     <h4>Login</h4>
     <div class="col-md-4">
-        {{ wtf.quick_form(form) }}
+        <form action="{{ url_for('auth.login') }}" method="POST">
+            {{ form.csrf_token }}
+            {{ displayInputField(form.email, "Email", autocomplete="off", autofocus=true) }}
+            {{ displayInputField(form.password, "Password") }}
+            {{ displayCheckField(form.remember_me) }}
+            {{ displaySubmitButton(form.submit)}}
+        </form>
     </div>
 </div>
 {% endblock %}
