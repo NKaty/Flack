@@ -14,7 +14,7 @@
 
 <body class="d-flex flex-column">
     <nav id="navbar" class="navbar navbar-expand-sm navbar-dark bg-dark mb-3">
-        <a class="navbar-brand mb-0 h1" href="{{ url_for('main.index') }}">Flack</a>
+        <a class="navbar-brand mb-0 h1 d-none d-sm-block" href="{{ url_for('main.index') }}">Flack</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-menu"
                 aria-controls="auth" aria-expanded="false">
             <span class="navbar-toggler-icon"></span>
@@ -52,7 +52,7 @@
         </div>
     </nav>
 
-    <main class="container">
+    <main>
         <div id="flash-messages">
             {% for message in get_flashed_messages(True) %}
             <div class="alert alert-{{ message[0] }} alert-dismissible fade show" role="alert">

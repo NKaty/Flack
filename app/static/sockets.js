@@ -223,6 +223,7 @@ $(function () {
       this.messagesSection = this.messages.closest('.chat-section');
       this.channelsSection = this.channels.closest('.chat-section');
       this.membersSection = this.members.closest('.chat-section');
+      this.channelNameHeader = $('#channel-name-header');
       this.createChannelModal = $('#create-channel-modal');
       this.channelInput = this.createChannelModal.find('input[name="channel"]');
       this.submitNewChannelButton = this.createChannelModal.find('#submit');
@@ -255,7 +256,6 @@ $(function () {
 
     initialize () {
       this.handlebarsHelpers();
-      this.setTopMarginAfterFixedHeaders();
       this.setChatContainerHeight();
       this.onWindowResize();
       this.validateSendMessageForm();
@@ -275,12 +275,6 @@ $(function () {
         text = Handlebars.Utils.escapeExpression(text);
         text = text.replace(/(\r\n|\n|\r)/gm, '<br>');
         return new Handlebars.SafeString(text);
-      });
-    }
-
-    setTopMarginAfterFixedHeaders () {
-      this.fixedHeaders.each((index, item) => {
-        $(item).next().first().css('padding-top', $(item).outerHeight(true));
       });
     }
 
@@ -333,6 +327,7 @@ $(function () {
 
     setChannelActive (channel) {
       $(channel).addClass('active').siblings().removeClass('active');
+      this.channelNameHeader.html($(channel).html());
     }
 
     getDataAttributeChannel (elem) {

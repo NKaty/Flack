@@ -9,7 +9,7 @@ input:not([type="hidden"]) + .invalid-feedback {
 .chat-container {
     display: flex;
     overflow: hidden;
-    position: relative;
+    /*position: relative;*/
     width: 100%;
 }
 
@@ -36,9 +36,25 @@ input:not([type="hidden"]) + .invalid-feedback {
     display: none;
 }
 
+.channels {
+    border-right: 1px solid #000000;
+}
+
+.members {
+    border-left: 1px solid #000000;
+}
+
 .fixed-header {
     background-color: white;
     padding-bottom: 10px;
+    display: flex;
+    /*justify-content: center;*/
+    position: sticky;
+    top: 0;
+}
+
+.aaa {
+    /*width: 100%;*/
 }
 
 textarea[name="message"] {
