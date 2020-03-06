@@ -3,10 +3,11 @@
 {% block title %}Channels - {% endblock %}
 
 {% block page_content %}
-<div class="chat-container" id="chat-container">
-    <div class="chat-section channels">
+<div class="chat-container tab-content" id="chat-container">
+    <div class="chat-section channels tab-pane d-lg-block animated slideInLeft faster" id="channels-tab">
         <div class="fixed-header">
-            <h3 class="aaa">Channels</h3>
+            <button class="d-block d-lg-none toggle-pane" data-toggle="tab" data-target="#messages-tab">[</button>
+            <h3>Channels</h3>
             <button id="create-channel" data-toggle="modal" data-target="#create-channel-modal">
                 Create channel
             </button>
@@ -18,11 +19,11 @@
             <!--            </div>-->
         </div>
     </div>
-    <div class="chat-section messages">
+    <div class="chat-section messages d-lg-block tab-pane active"  id="messages-tab">
         <div class="fixed-header justify-content-lg-center justify-content-between">
-            <button class="d-block d-lg-none">[</button>
+            <button class="d-block d-lg-none toggle-pane" data-toggle="tab" data-target="#channels-tab">[</button>
             <h3 id="channel-name-header">{{ user.current_channel.name if user.channel_id else 'Chat'}}</h3>
-            <button class="d-block d-lg-none">]</button>
+            <button class="d-block d-lg-none toggle-pane" data-toggle="tab" data-target="#members-tab">[</button>
         </div>
         <div id="messages-sentinel" class="sentinel d-flex justify-content-center mb-2">
             <div class="spinner-border text-secondary" id="messages-spinner" role="status">
@@ -46,8 +47,9 @@
             </form>
         </div>
     </div>
-    <div class="chat-section members">
+    <div class="chat-section members tab-pane d-lg-block" id="members-tab">
         <div class="fixed-header">
+            <button class="d-block d-lg-none toggle-pane" data-toggle="tab" data-target="#messages-tab">[</button>
             <h3>Members</h3>
         </div>
         <ul id="members"></ul>
@@ -101,7 +103,7 @@
 
 <script id="channels-template" type="text/x-handlebars-template">
     {{#each channels}}
-    <li class="{{#if_eq this ../activeChannel}}active{{/if_eq}}" data-channel="{{this}}">
+    <li class="{{#if_eq this ../activeChannel}}channel-active{{/if_eq}}" data-channel="{{this}}">
         {{this}}
     </li>
     {{/each}}

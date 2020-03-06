@@ -224,6 +224,8 @@ $(function () {
       this.channelsSection = this.channels.closest('.chat-section');
       this.membersSection = this.members.closest('.chat-section');
       this.channelNameHeader = $('#channel-name-header');
+      this.toggleChannelsButton = $('#toggle-channels');
+      this.toggleMembersButton = $('#toggle-members');
       this.createChannelModal = $('#create-channel-modal');
       this.channelInput = this.createChannelModal.find('input[name="channel"]');
       this.submitNewChannelButton = this.createChannelModal.find('#submit');
@@ -237,7 +239,6 @@ $(function () {
       this.membersTemplate = $('#members-template');
       this.messagesTemplate = $('#messages-template');
       this.logoutButton = $('#logout');
-      this.fixedHeaders = $('.fixed-header');
       this.navbar = $('#navbar');
       this.chatContainer = $('#chat-container');
       // this.spinners = $('.spinner-border');
@@ -257,6 +258,7 @@ $(function () {
     initialize () {
       this.handlebarsHelpers();
       this.setChatContainerHeight();
+      this.togglePane();
       this.onWindowResize();
       this.validateSendMessageForm();
       this.resizeMessageInput();
@@ -322,11 +324,11 @@ $(function () {
     }
 
     isChannelActive (channel) {
-      return $(channel).hasClass('active');
+      return $(channel).hasClass('channel-active');
     }
 
     setChannelActive (channel) {
-      $(channel).addClass('active').siblings().removeClass('active');
+      $(channel).addClass('channel-active').siblings().removeClass('channel-active');
       this.channelNameHeader.html($(channel).html());
     }
 
@@ -336,6 +338,12 @@ $(function () {
 
     getDataAttributeFile (elem) {
       return $(elem).data('file_id');
+    }
+
+    togglePane () {
+      $('.toggle-pane').on('click', function() {
+        $('.toggle-pane').removeClass('active');
+      });
     }
 
     checkChannelCreateForm (channelName) {

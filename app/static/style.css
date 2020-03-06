@@ -2,15 +2,16 @@ input:not([type="hidden"]) + .invalid-feedback {
     display: block;
 }
 
-.active {
+.channel-active {
     color: blue;
 }
 
 .chat-container {
     display: flex;
     overflow: hidden;
-    /*position: relative;*/
+    position: relative;
     width: 100%;
+    opacity: 0.99;
 }
 
 .chat-section {
@@ -24,6 +25,7 @@ input:not([type="hidden"]) + .invalid-feedback {
 
 .channels, .members {
     flex: 1;
+    min-width: 200px;
 }
 
 .messages {
@@ -48,13 +50,8 @@ input:not([type="hidden"]) + .invalid-feedback {
     background-color: white;
     padding-bottom: 10px;
     display: flex;
-    /*justify-content: center;*/
     position: sticky;
     top: 0;
-}
-
-.aaa {
-    /*width: 100%;*/
 }
 
 textarea[name="message"] {
