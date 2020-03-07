@@ -224,8 +224,9 @@ $(function () {
       this.channelsSection = this.channels.closest('.chat-section');
       this.membersSection = this.members.closest('.chat-section');
       this.channelNameHeader = $('#channel-name-header');
-      this.toggleChannelsButton = $('#toggle-channels');
-      this.toggleMembersButton = $('#toggle-members');
+      this.togglePaneButtons = $('.toggle-pane');
+      this.openMembersButton = $('#open-members');
+      this.closeMembersButton = $('#close-members');
       this.createChannelModal = $('#create-channel-modal');
       this.channelInput = this.createChannelModal.find('input[name="channel"]');
       this.submitNewChannelButton = this.createChannelModal.find('#submit');
@@ -259,9 +260,12 @@ $(function () {
       this.handlebarsHelpers();
       this.setChatContainerHeight();
       this.togglePane();
+      this.openMembersPane();
+      this.closeMembersPane();
       this.onWindowResize();
       this.validateSendMessageForm();
       this.resizeMessageInput();
+      this.animatePaneChanging();
     }
 
     handlebarsHelpers () {
@@ -341,8 +345,42 @@ $(function () {
     }
 
     togglePane () {
-      $('.toggle-pane').on('click', function() {
+      $('.toggle-pane').on('click', function () {
         $('.toggle-pane').removeClass('active');
+      });
+    }
+
+    animatePaneChanging () {
+      this.togglePaneButtons.on('show.bs.tab', function () {
+        let animationClass = 'animated faster ';
+        const nextPane = $($(this).data('target'));
+        if (nextPane.hasClass('channels')) animationClass += 'slideInLeft';
+        else if (nextPane.hasClass('members')) animationClass += 'slideInRight';
+        else if (nextPane.hasClass('messages')) {
+          const currentPane = $(this).closest('.chat-section');
+          if (currentPane.hasClass('channels')) animationClass += 'slideInRight';
+          else if (currentPane.hasClass('members')) animationClass += 'slideInLeft';
+        }
+
+        function onAnimationEnded () {
+          nextPane.removeClass(animationClass);
+          nextPane.off('animationend', onAnimationEnded);
+        }
+
+        nextPane.addClass(animationClass);
+        nextPane.on('animationend', onAnimationEnded);
+      });
+    }
+
+    openMembersPane () {
+      this.openMembersButton.on('click', () => {
+        this.membersSection.addClass('d-sm-block');
+      });
+    }
+
+    closeMembersPane () {
+      this.closeMembersButton.on('click', () => {
+        this.membersSection.removeClass('d-sm-block');
       });
     }
 

@@ -4,13 +4,13 @@
 
 {% block page_content %}
 <div class="chat-container tab-content" id="chat-container">
-    <div class="chat-section channels tab-pane d-lg-block animated slideInLeft faster" id="channels-tab">
+    <div class="chat-section channels tab-pane d-sm-block" id="channels-tab">
         <div class="fixed-header">
-            <button class="d-block d-lg-none toggle-pane" data-toggle="tab" data-target="#messages-tab">[</button>
             <h3>Channels</h3>
-            <button id="create-channel" data-toggle="modal" data-target="#create-channel-modal">
+            <button id="create-channel" data-toggle="modal" data-target="#create-channel-modal" >
                 Create channel
             </button>
+            <button class="d-block d-sm-none toggle-pane" data-toggle="tab" data-target="#messages-tab">[</button>
         </div>
         <ul id="channels"></ul>
         <div id="channels-sentinel" class="sentinel d-flex justify-content-center mt-2">
@@ -19,11 +19,12 @@
             <!--            </div>-->
         </div>
     </div>
-    <div class="chat-section messages d-lg-block tab-pane active"  id="messages-tab">
-        <div class="fixed-header justify-content-lg-center justify-content-between">
-            <button class="d-block d-lg-none toggle-pane" data-toggle="tab" data-target="#channels-tab">[</button>
+    <div class="chat-section messages d-sm-block tab-pane active" id="messages-tab">
+        <div class="fixed-header justify-content-sm-center justify-content-between">
+            <button class="d-block d-sm-none toggle-pane" data-toggle="tab" data-target="#channels-tab">[</button>
             <h3 id="channel-name-header">{{ user.current_channel.name if user.channel_id else 'Chat'}}</h3>
-            <button class="d-block d-lg-none toggle-pane" data-toggle="tab" data-target="#members-tab">[</button>
+            <button class="d-block d-sm-none toggle-pane" data-toggle="tab" data-target="#members-tab">[</button>
+            <button class="d-none d-sm-block d-lg-none" id="open-members">[</button>
         </div>
         <div id="messages-sentinel" class="sentinel d-flex justify-content-center mb-2">
             <div class="spinner-border text-secondary" id="messages-spinner" role="status">
@@ -49,8 +50,9 @@
     </div>
     <div class="chat-section members tab-pane d-lg-block" id="members-tab">
         <div class="fixed-header">
-            <button class="d-block d-lg-none toggle-pane" data-toggle="tab" data-target="#messages-tab">[</button>
+            <button class="d-block d-md-none toggle-pane" data-toggle="tab" data-target="#messages-tab">[</button>
             <h3>Members</h3>
+            <button class="d-none d-sm-block d-lg-none" id="close-members">x</button>
         </div>
         <ul id="members"></ul>
         <div id="members-sentinel" class="sentinel d-flex justify-content-center mt-2">
