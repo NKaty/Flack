@@ -25,11 +25,18 @@ input:not([type="hidden"]) + .invalid-feedback {
 
 .channels, .members {
     flex: 1;
-    min-width: 200px;
+    min-width: 230px;
+    transition: all 0.3s linear;
 }
 
 .messages {
     flex: 2;
+    transition: all 0.3s linear;
+}
+
+.removed {
+    flex: 0;
+    min-width: 0;
 }
 
 .channels::-webkit-scrollbar,

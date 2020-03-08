@@ -374,13 +374,19 @@ $(function () {
 
     openMembersPane () {
       this.openMembersButton.on('click', () => {
-        this.membersSection.addClass('d-sm-block');
+        this.membersSection.addClass('removed d-sm-block');
+        setTimeout(() => this.membersSection.removeClass('removed'), 50);
       });
     }
 
     closeMembersPane () {
       this.closeMembersButton.on('click', () => {
-        this.membersSection.removeClass('d-sm-block');
+        this.membersSection.addClass('removed');
+        const onAnimationEnded = () => {
+          this.membersSection.removeClass('d-sm-block removed');
+          this.membersSection.off('transitionend', onAnimationEnded);
+        };
+        this.membersSection.on('transitionend', onAnimationEnded);
       });
     }
 
