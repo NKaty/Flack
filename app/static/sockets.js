@@ -225,7 +225,7 @@ $(function () {
       this.membersSection = this.members.closest('.chat-section');
       this.channelNameHeader = $('#channel-name-header');
       this.togglePaneButtons = $('.toggle-pane');
-      this.openMembersButton = $('#open-members');
+      this.toggleMembersButton = $('#open-members');
       this.closeMembersButton = $('#close-members');
       this.createChannelModal = $('#create-channel-modal');
       this.channelInput = this.createChannelModal.find('input[name="channel"]');
@@ -260,8 +260,8 @@ $(function () {
       this.handlebarsHelpers();
       this.setChatContainerHeight();
       this.togglePane();
-      this.openMembersPane();
-      this.closeMembersPane();
+      this.onToggleMembersPane();
+      this.onCloseMembersPane();
       this.onWindowResize();
       this.validateSendMessageForm();
       this.resizeMessageInput();
@@ -372,22 +372,32 @@ $(function () {
       });
     }
 
-    openMembersPane () {
-      this.openMembersButton.on('click', () => {
-        this.membersSection.addClass('removed d-sm-block');
-        setTimeout(() => this.membersSection.removeClass('removed'), 50);
+    onToggleMembersPane () {
+      const self = this;
+      this.toggleMembersButton.on('click', function () {
+        if ($(this).hasClass('active')) self.closeMembersPane();
+        else {
+          self.membersSection.addClass('removed d-sm-block');
+          $(this).addClass('active');
+          setTimeout(() => self.membersSection.removeClass('removed'), 50);
+        }
+      });
+    }
+
+    onCloseMembersPane () {
+      this.closeMembersButton.on('click', () => {
+        this.closeMembersPane();
       });
     }
 
     closeMembersPane () {
-      this.closeMembersButton.on('click', () => {
-        this.membersSection.addClass('removed');
-        const onAnimationEnded = () => {
-          this.membersSection.removeClass('d-sm-block removed');
-          this.membersSection.off('transitionend', onAnimationEnded);
-        };
-        this.membersSection.on('transitionend', onAnimationEnded);
-      });
+      this.membersSection.addClass('removed');
+      const onAnimationEnded = () => {
+        this.membersSection.removeClass('d-sm-block removed');
+        this.toggleMembersButton.removeClass('active');
+        this.membersSection.off('transitionend', onAnimationEnded);
+      };
+      this.membersSection.on('transitionend', onAnimationEnded);
     }
 
     checkChannelCreateForm (channelName) {

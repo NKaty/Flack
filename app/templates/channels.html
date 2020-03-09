@@ -5,12 +5,16 @@
 {% block page_content %}
 <div class="chat-container tab-content" id="chat-container">
     <div class="chat-section channels tab-pane d-sm-block" id="channels-tab">
-        <div class="fixed-header">
-            <h3>Channels</h3>
-            <button id="create-channel" data-toggle="modal" data-target="#create-channel-modal" >
-                Create channel
-            </button>
-            <button class="d-block d-sm-none toggle-pane" data-toggle="tab" data-target="#messages-tab">[</button>
+        <div class="fixed-header justify-content-center">
+            <h4>Channels</h4>
+            <div class="icon-button cursor-pointer" id="create-channel" data-toggle="modal"
+                 data-target="#create-channel-modal">
+                <i class="fas fa-plus-circle"></i>
+            </div>
+            <div class="d-block d-sm-none toggle-pane icon-button-arrow icon-button-absolute icon-button-right"
+                 data-toggle="tab" data-target="#messages-tab">
+                <i class="fas fa-arrow-right"></i>
+            </div>
         </div>
         <ul id="channels"></ul>
         <div id="channels-sentinel" class="sentinel d-flex justify-content-center mt-2">
@@ -20,11 +24,20 @@
         </div>
     </div>
     <div class="chat-section messages d-sm-block tab-pane active" id="messages-tab">
-        <div class="fixed-header justify-content-sm-center justify-content-between">
-            <button class="d-block d-sm-none toggle-pane" data-toggle="tab" data-target="#channels-tab">[</button>
-            <h3 id="channel-name-header">{{ user.current_channel.name if user.channel_id else 'Chat'}}</h3>
-            <button class="d-block d-sm-none toggle-pane" data-toggle="tab" data-target="#members-tab">[</button>
-            <button class="d-none d-sm-block d-lg-none" id="open-members">[</button>
+        <div class="fixed-header justify-content-center">
+            <div class="d-block d-sm-none toggle-pane cursor-pointer icon-button-arrow icon-button-absolute icon-button-left"
+                 data-toggle="tab" data-target="#channels-tab">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+            <h4 id="channel-name-header">{{ user.current_channel.name if user.channel_id else 'Chat'}}</h4>
+            <div class="d-block d-sm-none toggle-pane cursor-pointer icon-button-arrow icon-button-absolute icon-button-right"
+                 data-toggle="tab" data-target="#members-tab">
+                <i class="fas fa-arrow-right"></i>
+            </div>
+            <div class="d-none d-sm-block d-lg-none cursor-pointer icon-button icon-button-absolute icon-button-right"
+                 id="open-members">
+                <i class="fas fa-info-circle"></i>
+            </div>
         </div>
         <div id="messages-sentinel" class="sentinel d-flex justify-content-center mb-2">
             <div class="spinner-border text-secondary" id="messages-spinner" role="status">
@@ -49,10 +62,16 @@
         </div>
     </div>
     <div class="chat-section members tab-pane d-lg-block" id="members-tab">
-        <div class="fixed-header">
-            <button class="d-block d-sm-none toggle-pane" data-toggle="tab" data-target="#messages-tab">[</button>
-            <h3>Members</h3>
-            <button class="d-none d-sm-block d-lg-none" id="close-members">x</button>
+        <div class="fixed-header justify-content-center">
+            <div class="d-block d-sm-none toggle-pane cursor-pointer icon-button-arrow icon-button-absolute icon-button-left"
+                 data-toggle="tab" data-target="#messages-tab">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+            <h4>Members</h4>
+            <div class="d-none d-sm-block d-lg-none cursor-pointer icon-button-close icon-button-absolute icon-button-right"
+                 id="close-members">
+                <i class="fas fa-times"></i>
+            </div>
         </div>
         <ul id="members"></ul>
         <div id="members-sentinel" class="sentinel d-flex justify-content-center mt-2">

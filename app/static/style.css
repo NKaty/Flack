@@ -64,3 +64,50 @@ input:not([type="hidden"]) + .invalid-feedback {
 textarea[name="message"] {
     resize: none;
 }
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.icon-button {
+    background-color: inherit;
+    color: #007bff;
+    font-size: 1.2em;
+    padding: 0 0.3em;
+}
+
+.icon-button:hover {
+    color: #0069d9;
+}
+
+.icon-button-close {
+    background-color: inherit;
+    color: #343a40;
+    font-size: 1.2em;
+    padding: 0 0.3em;
+}
+
+.icon-button-arrow {
+    background-color: inherit;
+    color: #343a40;
+    font-size: 1.4em;
+    padding: 0 0.5em;
+}
+
+.icon-button-arrow:hover,
+.icon-button-close:hover {
+    color: #000;
+}
+
+.icon-button-absolute {
+    position: absolute;
+    top: 0;
+}
+
+.icon-button-right {
+    right: 0;
+}
+
+.icon-button-left {
+    left: 0;
+}
