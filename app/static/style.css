@@ -11,7 +11,6 @@ input:not([type="hidden"]) + .invalid-feedback {
     overflow: hidden;
     position: relative;
     width: 100%;
-    opacity: 0.99;
 }
 
 .chat-section {
@@ -59,6 +58,13 @@ input:not([type="hidden"]) + .invalid-feedback {
     display: flex;
     position: sticky;
     top: 0;
+}
+
+.items-list {
+    margin: auto;
+    width: max-content;
+    list-style-type: none;
+    padding: 0;
 }
 
 textarea[name="message"] {

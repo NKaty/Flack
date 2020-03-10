@@ -225,6 +225,7 @@ $(function () {
       this.membersSection = this.members.closest('.chat-section');
       this.channelNameHeader = $('#channel-name-header');
       this.togglePaneButtons = $('.toggle-pane');
+      this.toggleChannelPaneButton = $('.toggle-pane[data-target="#messages-tab"]')
       this.toggleMembersButton = $('#open-members');
       this.closeMembersButton = $('#close-members');
       this.createChannelModal = $('#create-channel-modal');
@@ -334,6 +335,7 @@ $(function () {
     setChannelActive (channel) {
       $(channel).addClass('channel-active').siblings().removeClass('channel-active');
       this.channelNameHeader.html($(channel).html());
+      if (this.toggleChannelPaneButton.css('display') !== 'none') this.toggleChannelPaneButton.tab('show');
     }
 
     getDataAttributeChannel (elem) {
@@ -345,8 +347,8 @@ $(function () {
     }
 
     togglePane () {
-      $('.toggle-pane').on('click', function () {
-        $('.toggle-pane').removeClass('active');
+      this.togglePaneButtons.on('click', () => {
+        this.togglePaneButtons.removeClass('active');
       });
     }
 
@@ -375,6 +377,7 @@ $(function () {
     onToggleMembersPane () {
       const self = this;
       this.toggleMembersButton.on('click', function () {
+        self.checkScreenChangedFromExtraSmall();
         if ($(this).hasClass('active')) self.closeMembersPane();
         else {
           self.membersSection.addClass('removed d-sm-block');
@@ -386,6 +389,7 @@ $(function () {
 
     onCloseMembersPane () {
       this.closeMembersButton.on('click', () => {
+        this.checkScreenChangedFromExtraSmall();
         this.closeMembersPane();
       });
     }
@@ -398,6 +402,14 @@ $(function () {
         this.membersSection.off('transitionend', onAnimationEnded);
       };
       this.membersSection.on('transitionend', onAnimationEnded);
+    }
+
+    checkScreenChangedFromExtraSmall () {
+      if (this.membersSection.hasClass('active')) {
+          this.membersSection.removeClass('active').addClass('d-sm-block');
+          this.messagesSection.addClass('active');
+          this.toggleMembersButton.addClass('active');
+        }
     }
 
     checkChannelCreateForm (channelName) {
