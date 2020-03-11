@@ -8,12 +8,12 @@
 {% endmacro %}
 
 {% macro displayCheckField(field) %}
-<div class="form-check">
-    {{ field(class_="form-check-input", **kwargs) }}
-    {{ field.label(class_="form-check-label") }}
+<div class="custom-control custom-checkbox text-left">
+    {{ field(class_="custom-control-input", **kwargs) }}
+    {{ field.label(class_="custom-control-label") }}
 </div>
 {% endmacro %}
 
 {% macro displaySubmitButton(field) %}
-{{ field(class_="btn btn-primary")}}
+{{ field(class_="btn btn-info my-4")}}
 {% endmacro %}

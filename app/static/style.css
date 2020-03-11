@@ -1,9 +1,15 @@
+.main-container {
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
 input:not([type="hidden"]) + .invalid-feedback {
     display: block;
 }
 
 .channel-active {
-    color: blue;
+    color: #17a2b8;
 }
 
 .chat-container {
@@ -58,6 +64,7 @@ input:not([type="hidden"]) + .invalid-feedback {
     display: flex;
     position: sticky;
     top: 0;
+    z-index: 100;
 }
 
 .items-list {
@@ -116,4 +123,28 @@ textarea[name="message"] {
 
 .icon-button-left {
     left: 0;
+}
+
+.form-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.form {
+    padding: 2em;
+    max-width: 380px;
+    background-color: #fff;
+    border-radius: 3px;
+}
+
+.custom-checkbox .custom-control-input~.custom-control-label::before {
+    border: 2px solid #17a2b8;
+}
+
+.custom-checkbox .custom-control-input:checked~.custom-control-label::before {
+    background-color: #17a2b8;
+}
+.custom-control-input:checked~.custom-control-label::before {
+    color: #fff;
+    background-color: #17a2b8;
 }

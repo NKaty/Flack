@@ -13,8 +13,8 @@
     <title>{% block title %}{% endblock %}Chat</title>
 </head>
 
-<body class="d-flex flex-column">
-    <nav id="navbar" class="navbar navbar-expand-sm navbar-dark bg-dark mb-3">
+<body class="min-vh-100 d-flex flex-column">
+    <nav id="navbar" class="navbar navbar-expand-sm navbar-dark bg-dark">
         <a class="navbar-brand mb-0 h1 d-none d-sm-block" href="{{ url_for('main.index') }}">Flack</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-menu"
                 aria-controls="auth" aria-expanded="false">
@@ -53,7 +53,8 @@
         </div>
     </nav>
 
-    <main>
+    <main class="container-fluid flex-grow-1 main-container pt-3"
+          style="background-image: url('{{ url_for('static', filename='images/bg-img.jpg') }}')">
         <div id="flash-messages">
             {% for message in get_flashed_messages(True) %}
             <div class="alert alert-{{ message[0] }} alert-dismissible fade show" role="alert">

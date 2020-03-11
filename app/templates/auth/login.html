@@ -4,9 +4,9 @@
 {% block title %}Login - Chat{% endblock %}
 
 {% block page_content %}
-<div class="text-center my-5">
-    <h4>Login</h4>
-    <div class="col-md-4">
+<div class="my-5 form-wrapper">
+    <div class="col-sm-8 text-center form">
+        <h4 class="text-secondary mb-4">Login</h4>
         <form action="{{ url_for('auth.login') }}" method="POST">
             {{ form.csrf_token }}
             {{ displayInputField(form.email, "Email", autocomplete="off", autofocus=true) }}
