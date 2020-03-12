@@ -186,3 +186,16 @@ textarea[name="message"] {
 input:not([type="hidden"]) ~ .invalid-feedback {
     display: block;
 }
+
+.form-link {
+    color: #6c757d;
+    text-decoration: none;
+    border-bottom: 1px solid #6c757d;
+}
+
+.form-link:hover {
+    color: #17a2b8;
+    text-decoration: none;
+    border-bottom: 1px solid #17a2b8;
+    transition: all 0.4s linear;
+}

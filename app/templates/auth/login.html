@@ -14,6 +14,10 @@
             {{ displayCheckField(form.remember_me) }}
             {{ displaySubmitButton(form.submit)}}
         </form>
+        <div class="mt-4 text-secondary">
+            <span>Don't have an account?</span>
+            <a class="form-link" href="{{ url_for('auth.signup') }}">Sign up</a>
+        </div>
     </div>
 </div>
 {% endblock %}

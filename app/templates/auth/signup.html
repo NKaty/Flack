@@ -15,6 +15,10 @@
             {{ displayInputField(form.password2, "Confirm password", "fas fa-lock") }}
             {{ displaySubmitButton(form.submit)}}
         </form>
+        <div class="mt-4 text-secondary">
+            <span>Already have an account?</span>
+            <a class="form-link" href="{{ url_for('auth.login') }}">Log in</a>
+        </div>
     </div>
 </div>
 {% endblock %}
