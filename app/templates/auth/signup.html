@@ -4,9 +4,10 @@
 {% block title %}Signup - Chat{% endblock %}
 
 {% block page_content %}
-<div class="my-5 form-wrapper">
+<div class="min-vh-100 form-wrapper">
     <div class="col-sm-8 text-center form">
-        <h4 class="text-secondary mb-4">Sign up</h4>
+        <h4 class="mb-4">Sign up</h4>
+        <p class="text-secondary font-weight-light">Create an account to start using Flack!</p>
         <form action="{{ url_for('auth.signup') }}" method="POST">
             {{ form.csrf_token }}
             {{ displayInputField(form.username, "Username", "fas fa-user", autocomplete="off", autofocus=true) }}

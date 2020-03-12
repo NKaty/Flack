@@ -14,46 +14,9 @@
 </head>
 
 <body class="min-vh-100 d-flex flex-column">
-    <nav id="navbar" class="navbar navbar-expand-sm navbar-dark bg-dark">
-        <a class="navbar-brand mb-0 h1 d-none d-sm-block" href="{{ url_for('main.index') }}">Flack</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-menu"
-                aria-controls="auth" aria-expanded="false">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="nav-menu">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item {{ 'active' if request.path == url_for('main.index') else '' }}">
-                    <a class="nav-link" href="{{ url_for('main.index') }}">Home</a>
-                </li>
-                {% if session.user_id %}
-                <li class="nav-item {{ 'active' if request.path == url_for('main.channels') else '' }}">
-                    <a class="nav-link" href="{{ url_for('main.channels') }}">Chat</a>
-                </li>
-                {% endif %}
-            </ul>
-            {% if session.user_id %}
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <span class="navbar-text">{{ session.username }}</span>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="logout" href="{{ url_for('auth.logout') }}">Log out</a>
-                </li>
-            </ul>
-            {% else %}
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item {{ 'active' if request.path == url_for('auth.login') else '' }}">
-                    <a class="nav-link" href="{{ url_for('auth.login') }}">Log in</a>
-                </li>
-                <li class="nav-item {{ 'active' if request.path == url_for('auth.signup') else '' }}">
-                    <a class="nav-link" href="{{ url_for('auth.signup') }}">Sign up</a>
-                </li>
-            </ul>
-            {% endif %}
-        </div>
-    </nav>
+    {% block nav %}{% endblock %}
 
-    <main class="container-fluid flex-grow-1 main-container pt-3"
+    <main class="container-fluid flex-grow-1 main-container"
           style="background-image: url('{{ url_for('static', filename='images/bg-img.jpg') }}')">
         <div id="flash-messages">
             {% for message in get_flashed_messages(True) %}

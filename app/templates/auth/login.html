@@ -4,9 +4,10 @@
 {% block title %}Login - Chat{% endblock %}
 
 {% block page_content %}
-<div class="my-5 form-wrapper">
+<div class="min-vh-100 form-wrapper">
     <div class="col-sm-8 text-center form">
-        <h4 class="text-secondary mb-4">Login</h4>
+        <h4 class="mb-4">Login</h4>
+        <p class="text-secondary font-weight-light">Enter your Flack account to start chatting!</p>
         <form action="{{ url_for('auth.login') }}" method="POST">
             {{ form.csrf_token }}
             {{ displayInputField(form.email, "Email", "fas fa-envelope", autocomplete="off", autofocus=true) }}

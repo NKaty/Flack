@@ -2,6 +2,21 @@
 
 {% block title %}Channels - {% endblock %}
 
+{% block nav %}
+<nav id="navbar" class="navbar navbar-dark bg-dark">
+    <ul class="navbar-nav mr-auto">
+        <li class="navbar-brand mb-0 h1">Flack</li>
+    </ul>
+    {% if session.user_id %}
+    <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+            <a class="nav-link" id="logout" href="{{ url_for('auth.logout') }}">Log out</a>
+        </li>
+    </ul>
+    {% endif %}
+</nav>
+{% endblock %}
+
 {% block page_content %}
 <div class="chat-container tab-content" id="chat-container">
     <div class="chat-section channels tab-pane d-sm-block" id="channels-tab">
