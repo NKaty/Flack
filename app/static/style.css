@@ -4,10 +4,6 @@
     background-repeat: no-repeat;
 }
 
-input:not([type="hidden"]) + .invalid-feedback {
-    display: block;
-}
-
 .channel-active {
     color: #17a2b8;
 }
@@ -137,14 +133,56 @@ textarea[name="message"] {
     border-radius: 3px;
 }
 
-.custom-checkbox .custom-control-input~.custom-control-label::before {
+.custom-checkbox .custom-control-input ~ .custom-control-label::before {
     border: 2px solid #17a2b8;
 }
 
-.custom-checkbox .custom-control-input:checked~.custom-control-label::before {
+.custom-checkbox .custom-control-input:checked ~ .custom-control-label::before {
     background-color: #17a2b8;
 }
-.custom-control-input:checked~.custom-control-label::before {
+
+.custom-control-input:checked ~ .custom-control-label::before {
     color: #fff;
     background-color: #17a2b8;
+}
+
+.form-control::-webkit-input-placeholder {
+    opacity: 0.7;
+}
+
+.input-icon-wrapper {
+    position: relative;
+    width: 100%;
+    z-index: 1;
+}
+
+.input-icon-wrapper input {
+    background-color: transparent;
+}
+
+.input-icon-wrapper > input:focus {
+    background-color: transparent;
+}
+
+.input-icon {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: #6c757d;
+    width: 100%;
+    height: calc(1.5em + .75rem + 2px);
+    padding-left: 1.2em;
+    z-index: -1;
+    transition: padding-left 0.4s linear;
+}
+
+.input-icon-wrapper > input:focus + .input-icon {
+    color: #17a2b8;
+    padding-left: 1em;
+}
+
+input:not([type="hidden"]) ~ .invalid-feedback {
+    display: block;
 }

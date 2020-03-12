@@ -1,6 +1,9 @@
-{% macro displayInputField(field, fieldName) %}
-<div class="form-group">
-    {{ field(class_="form-control", placeholder=fieldName, required=true, **kwargs) }}
+{% macro displayInputField(field, fieldName, icon) %}
+<div class="form-group input-icon-wrapper">
+    {{ field(class_="form-control pl-5", placeholder=fieldName, required=true, **kwargs) }}
+    <span class="input-icon">
+        <i class="{{icon}}"></i>
+    </span>
     {% for error in field.errors %}
     <div class="invalid-feedback">{{ error }}</div>
     {% endfor %}
@@ -8,7 +11,7 @@
 {% endmacro %}
 
 {% macro displayCheckField(field) %}
-<div class="custom-control custom-checkbox text-left">
+<div class="custom-control custom-checkbox mt-4">
     {{ field(class_="custom-control-input", **kwargs) }}
     {{ field.label(class_="custom-control-label") }}
 </div>

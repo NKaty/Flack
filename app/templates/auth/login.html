@@ -9,8 +9,8 @@
         <h4 class="text-secondary mb-4">Login</h4>
         <form action="{{ url_for('auth.login') }}" method="POST">
             {{ form.csrf_token }}
-            {{ displayInputField(form.email, "Email", autocomplete="off", autofocus=true) }}
-            {{ displayInputField(form.password, "Password") }}
+            {{ displayInputField(form.email, "Email", "fas fa-envelope", autocomplete="off", autofocus=true) }}
+            {{ displayInputField(form.password, "Password", "fas fa-lock") }}
             {{ displayCheckField(form.remember_me) }}
             {{ displaySubmitButton(form.submit)}}
         </form>

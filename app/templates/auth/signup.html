@@ -9,10 +9,10 @@
         <h4 class="text-secondary mb-4">Sign up</h4>
         <form action="{{ url_for('auth.signup') }}" method="POST">
             {{ form.csrf_token }}
-            {{ displayInputField(form.username, "Username", autocomplete="off", autofocus=true) }}
-            {{ displayInputField(form.email, "Email", autocomplete="off") }}
-            {{ displayInputField(form.password, "Password") }}
-            {{ displayInputField(form.password2, "Confirm password") }}
+            {{ displayInputField(form.username, "Username", "fas fa-user", autocomplete="off", autofocus=true) }}
+            {{ displayInputField(form.email, "Email", "fas fa-envelope", autocomplete="off") }}
+            {{ displayInputField(form.password, "Password", "fas fa-lock") }}
+            {{ displayInputField(form.password2, "Confirm password", "fas fa-lock") }}
             {{ displaySubmitButton(form.submit)}}
         </form>
     </div>
