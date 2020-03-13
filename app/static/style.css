@@ -5,10 +5,11 @@
 }
 
 .channel-active {
-    color: #17a2b8;
+    color: #fff;
 }
 
 .chat-container {
+    color: #2f2f30;
     display: flex;
     overflow: hidden;
     position: relative;
@@ -46,21 +47,30 @@
     display: none;
 }
 
+.sentinel {
+    height: 1px;
+}
+
 .channels {
-    border-right: 1px solid #000000;
+    /*border-right: 1px solid #000000;*/
 }
 
 .members {
-    border-left: 1px solid #000000;
+    /*border-left: 1px solid #000000;*/
 }
 
 .fixed-header {
-    background-color: white;
-    padding-bottom: 10px;
+    padding: 0.7em 0;
+    margin-bottom: 1em;
+    color: #fff;
     display: flex;
     position: sticky;
     top: 0;
     z-index: 100;
+    background: -webkit-linear-gradient(to right, #7b79e8, #e95ef9);
+    background: -o-linear-gradient(to right, #7b79e8, #e95ef9);
+    background: -moz-linear-gradient(to right, #7b79e8, #e95ef9);
+    background: linear-gradient(to right, #7b79e8, #e95ef9);
 }
 
 .items-list {
@@ -80,20 +90,13 @@ textarea[name="message"] {
 
 .icon-button {
     background-color: inherit;
-    color: #007bff;
+    color: #fff;
     font-size: 1.2em;
     padding: 0 0.3em;
 }
 
 .icon-button:hover {
-    color: #0069d9;
-}
-
-.icon-button-close {
-    background-color: inherit;
-    color: #343a40;
-    font-size: 1.2em;
-    padding: 0 0.3em;
+    color: #d3dfea;
 }
 
 .icon-button-arrow {
@@ -110,7 +113,6 @@ textarea[name="message"] {
 
 .icon-button-absolute {
     position: absolute;
-    top: 0;
 }
 
 .icon-button-right {
@@ -199,4 +201,27 @@ input:not([type="hidden"]) ~ .invalid-feedback {
     text-decoration: none;
     border-bottom: 1px solid #17a2b8;
     transition: all 0.4s linear;
+}
+
+@media (min-width: 576px) {
+    .channels .fixed-header {
+        background: -webkit-linear-gradient(to right, #58a2e1, #8c6dea);
+        background: -o-linear-gradient(to right, #58a2e1, #8c6dea);
+        background: -moz-linear-gradient(to right, #58a2e1, #8c6dea);
+        background: linear-gradient(to right, #58a2e1, #8c6dea);
+    }
+
+    .messages .fixed-header {
+        background: -webkit-linear-gradient(to right, #8c6dea, #cf56f5);
+        background: -o-linear-gradient(to right, #8c6dea, #cf56f5);
+        background: -moz-linear-gradient(to right, #8c6dea, #cf56f5);
+        background: linear-gradient(to right, #8c6dea, #cf56f5);
+    }
+
+    .members .fixed-header {
+        background: -webkit-linear-gradient(to right, #ce57f6, #e95ef9);
+        background: -o-linear-gradient(to right, #ce57f6, #e95ef9);
+        background: -moz-linear-gradient(to right, #ce57f6, #e95ef9);
+        background: linear-gradient(to right, #ce57f6, #e95ef9);
+    }
 }
