@@ -7,7 +7,7 @@
     <ul class="navbar-nav mr-auto">
         <li class="navbar-brand mb-0 h1">Flack</li>
     </ul>
-    {% if session.user_id %}
+    {% if current_user.is_authenticated %}
     <ul class="navbar-nav ml-auto">
         <li class="nav-item">
             <a class="nav-link" id="logout" href="{{ url_for('auth.logout') }}">Log out</a>
@@ -33,9 +33,9 @@
         </div>
         <ul id="channels" class="lead items-list cursor-pointer"></ul>
         <div id="channels-sentinel" class="sentinel d-flex justify-content-center mt-2">
-<!--            <div class="spinner-border text-secondary" id="channels-spinner" role="status">-->
-<!--                <span class="sr-only">Loading...</span>-->
-<!--            </div>-->
+            <!--            <div class="spinner-border text-secondary" id="channels-spinner" role="status">-->
+            <!--                <span class="sr-only">Loading...</span>-->
+            <!--            </div>-->
         </div>
     </div>
     <div class="chat-section messages d-sm-block shadow-sm tab-pane active" id="messages-tab">
@@ -60,19 +60,25 @@
             </div>
         </div>
         <div id="messages-area">
-            <div id="messages">
+            <div id="messages" class="d-flex flex-column mx-3">
                 {% if not user.channel_id %}
                 <p>Select channel or create your own channel to start messaging</p>
                 {% endif %}
             </div>
-            <form class="form-inline {{ 'd-none' if not user.channel_id }}" id="send-message">
-                <div class="form-group mx-sm-3 mb-2">
-                    <textarea name="message" class="form-control" rows="3"></textarea>
+            <form class="mx-3 mt-3 {{ 'd-none' if not user.channel_id }}" id="send-message">
+                <div class="d-flex">
+                    <div class="form-group upload">
+                        <input name="file" type="file">
+                        <i class="fas fa-paperclip"></i>
+                    </div>
+                    <div class="form-group flex-grow-1 mx-2">
+                        <textarea name="message" class="form-control" rows="1"></textarea>
+                    </div>
+                    <div id="btn-send" class="icon-button icon-button-send align-self-center">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <input class="form-control-file" name="file" type="file">
-                </div>
-                <button type="button" class="btn btn-primary mb-2" disabled>Send</button>
+                <div class="upload-file-name" id="upload-file-name"></div>
             </form>
         </div>
     </div>
@@ -152,15 +158,19 @@
 </script>
 
 <script id="messages-template" type="text/x-handlebars-template">
-    {{#each .}}
-    <div class="message">
-        <span>{{author}}</span>
-        <span>{{date timestamp 'format' 'DD/MM/YYYY HH:mm:ss'}}</span>
+    {{#each messages}}
+    <div class="message card bg-light my-1 border-white {{#if_eq author ../username}}ml-auto{{else}}mr-auto{{/if_eq}}">
+        <div class="header d-flex w-100 justify-content-between">
+            <h6 class="lead">{{author}}</h6>
+            <small class="text-secondary">{{date timestamp 'format' 'DD/MM/YY HH:mm'}}</small>
+        </div>
         <div>{{breaklines text}}</div>
         {{#if file}}
-        <div>
-            <div>{{file.name}}</div>
-            <button class="download btn btn-secondary" data-file_id="{{file.id}}">Download</button>
+        <div class="d-flex align-items-center mt-1">
+            <div class="icon-button icon-button-download cursor-pointer download" data-file_id="{{file.id}}">
+                <i class="fas fa-file-download"></i>
+            </div>
+            <small>{{file.name}}</small>
         </div>
         {{/if}}
     </div>

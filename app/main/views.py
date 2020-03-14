@@ -28,7 +28,8 @@ def connect():
     db.session.add(current_user._get_current_object())
     db.session.commit()
     if current_user.channel_id is not None:
-        emit('set active channel', current_user.current_channel.name)
+        emit('set initial info', {'channel': current_user.current_channel.name,
+                                  'username': current_user.username})
 
 
 @socketio.on('disconnect')

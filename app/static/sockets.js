@@ -56,6 +56,7 @@ $(function () {
     constructor (view) {
       this.socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
       this.view = view;
+      this.username = null;
       this.activeChannel = null;
       this.isFirstConnect = true;
       this.initialize();
@@ -63,11 +64,12 @@ $(function () {
 
     initialize () {
       this.socket.on('connect', () => this.onConnect());
-      this.socket.on('set active channel', channel => this.onSetActiveChanel(channel));
+      this.socket.on('set initial info', data => this.onSetActiveChanel(data.channel, data.username));
       this.socket.on('load messages', data => this.messages.onLoad(data.messages,
                                                                    !this.messages.loadedNumber,
                                                                    data.fromSendMessage,
-                                                                   data.fromScrollEvent));
+                                                                   data.fromScrollEvent,
+                                                                   this.username));
       this.socket.on('load channels', data => this.channels.onLoad(data.channels, data.isReload,
                                                                    this.activeChannel));
       this.socket.on('load members', data => this.members.onLoad(data.members, data.isReload));
@@ -119,8 +121,9 @@ $(function () {
       this.messages = new ScrollComponent(messagesOptions);
     }
 
-    onSetActiveChanel (channel) {
+    onSetActiveChanel (channel, username) {
       if (this.isFirstConnect) {
+        this.username = username;
         this.activeChannel = channel;
         this.socket.emit('get messages', this.messages.loadedNumber, false);
         this.socket.emit('get channels', this.channels.loadedNumber);
@@ -225,7 +228,7 @@ $(function () {
       this.membersSection = this.members.closest('.chat-section');
       this.channelNameHeader = $('#channel-name-header');
       this.togglePaneButtons = $('.toggle-pane');
-      this.toggleChannelPaneButton = $('.toggle-pane[data-target="#messages-tab"]')
+      this.toggleChannelPaneButton = $('.toggle-pane[data-target="#messages-tab"]');
       this.toggleMembersButton = $('#open-members');
       this.closeMembersButton = $('#close-members');
       this.createChannelModal = $('#create-channel-modal');
@@ -234,8 +237,9 @@ $(function () {
       this.sendMessageForm = $('#send-message');
       this.messageInput = this.sendMessageForm.find('textarea[name="message"]');
       this.fileInput = this.sendMessageForm.find('input[name="file"]');
+      this.fileNameField = $('#upload-file-name');
       this.downloadButtonClass = '.download';
-      this.sendMessageButton = this.sendMessageForm.find('button');
+      this.sendMessageButton = this.sendMessageForm.find('#btn-send');
       this.flashTemplate = $('#flash-template');
       this.channelsTemplate = $('#channels-template');
       this.membersTemplate = $('#members-template');
@@ -264,6 +268,7 @@ $(function () {
       this.onToggleMembersPane();
       this.onCloseMembersPane();
       this.onWindowResize();
+      this.toggleUploadFileName();
       this.validateSendMessageForm();
       this.resizeMessageInput();
       this.animatePaneChanging();
@@ -406,10 +411,10 @@ $(function () {
 
     checkScreenChangedFromExtraSmall () {
       if (this.membersSection.hasClass('active')) {
-          this.membersSection.removeClass('active').addClass('d-sm-block');
-          this.messagesSection.addClass('active');
-          this.toggleMembersButton.addClass('active');
-        }
+        this.membersSection.removeClass('active').addClass('d-sm-block');
+        this.messagesSection.addClass('active');
+        this.toggleMembersButton.addClass('active');
+      }
     }
 
     checkChannelCreateForm (channelName) {
@@ -419,6 +424,10 @@ $(function () {
         isValid: isValid,
         error: isValid ? '' : 'Channel name must be between 1 and 64 characters long and have only letters, numbers, dots or underscores.'
       };
+    }
+
+    calculateUploadFileSize(fileSize) {
+      return fileSize / Math.pow(1024, 2).toFixed(1);
     }
 
     checkSendMessageForm (message, files) {
@@ -435,8 +444,7 @@ $(function () {
         }
         if (files[0].size > this.maxumumFileSize) {
           isValid = false;
-          const size = this.maxumumFileSize / Math.pow(1024, 2).toFixed(1);
-          errors.push(`File exceeded maximum size ${size}MB.`);
+          errors.push(`File exceeded maximum size ${this.calculateUploadFileSize(this.maxumumFileSize)}MB.`);
         }
       }
       return { isValid: isValid, error: errors.length ? errors.join(' ') : '' };
@@ -463,8 +471,19 @@ $(function () {
       });
     }
 
+    toggleUploadFileName () {
+      const self = this;
+      this.fileInput.on('change', function () {
+        const files = $(this).prop('files');
+        let html = '';
+        if (files.length > 0) html = `${files[0].name} - ${self.calculateUploadFileSize(files[0].size)}MB`;
+        self.fileNameField.html(html);
+        self.messagesSection.scrollTop(self.messagesSection[0].scrollHeight);
+      });
+    }
+
     validateSendMessageForm () {
-      this.sendMessageForm.on('input', () => {
+      this.sendMessageForm.on('change', () => {
         const validation = this.checkSendMessageForm(this.messageInput.val(), this.fileInput.prop('files'));
         this.sendMessageButton.prop('disabled', !validation.isValid);
         if (validation.error) this.showFormFieldErrorMessage(this.fileInput, validation.error);
@@ -486,9 +505,9 @@ $(function () {
       });
     }
 
-    renderMessages (messages, fromSendMessage, fromScrollEvent) {
+    renderMessages (messages, fromSendMessage, fromScrollEvent, username) {
       const template = Handlebars.compile(this.messagesTemplate.html());
-      const html = template(messages);
+      const html = template({ messages: messages, username: username });
       if (fromSendMessage) {
         this.messages.append(html);
         this.messagesSection.scrollTop(this.messagesSection[0].scrollHeight);
