@@ -51,14 +51,6 @@
     height: 1px;
 }
 
-.channels {
-    /*border-right: 1px solid #000000;*/
-}
-
-.members {
-    /*border-left: 1px solid #000000;*/
-}
-
 .fixed-header {
     padding: 0.7em 0;
     margin-bottom: 1em;
@@ -99,14 +91,21 @@ textarea[name="message"] {
     color: #fff;
     font-size: 1.2em;
     padding: 0 0.3em;
+    cursor: pointer;
 }
 
 .icon-button:hover {
     color: #d3dfea;
 }
 
-.icon-button-send {
+.icon-button-send-message-form {
     font-size: 1.5em;
+    border: none;
+}
+
+.icon-button-send-message-form:disabled {
+    color: #c7c8c9;
+    cursor: auto;
 }
 
 .icon-button-download {
@@ -122,6 +121,7 @@ textarea[name="message"] {
     color: #343a40;
     font-size: 1.4em;
     padding: 0 0.5em;
+    cursor: pointer;
 }
 
 .icon-button-arrow:hover,
@@ -141,7 +141,7 @@ textarea[name="message"] {
     left: 0;
 }
 
-.upload {
+.upload-field {
     height: 1.5em;
     width: 1.5em;
     position: relative;
@@ -149,11 +149,9 @@ textarea[name="message"] {
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    color: #fff;
-    font-size: 1.5em;
 }
 
-.upload input[type='file'] {
+.upload-field input[type='file'] {
     height: 1.5em;
     width: 1.5em;
     position: absolute;
@@ -162,8 +160,17 @@ textarea[name="message"] {
     opacity: 0;
 }
 
-.file-name:not(:empty):before {
-    content: "Selected file: ";
+.upload-file-name {
+    color: #d3dfea;
+}
+
+.upload-file-name:not(:empty) + .icon-button {
+    display: block !important;
+}
+
+.upload-file-name:not(:empty):before {
+    content: ' Selected file: ';
+    font-family: FontAwesome;
 }
 
 .form-wrapper {
@@ -231,6 +238,13 @@ textarea[name="message"] {
 
 input:not([type="hidden"]) ~ .invalid-feedback {
     display: block;
+}
+
+.upload-file ~ .invalid-feedback {
+    display: block;
+    color: #820b05;
+    margin-left: 1em;
+    margin-right: 1em;
 }
 
 .form-link {

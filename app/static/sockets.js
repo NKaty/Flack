@@ -165,7 +165,9 @@ $(function () {
               this.view.resetSendMessageForm();
             };
             fileReader.onerror = () => {
-              this.view.showFormFieldErrorMessage(this.view.fileInput, 'Error occurred while uploading the file.');
+              this.view.showFormFieldErrorMessage(this.view.fileInfoGroup,
+                                                  'Error occurred while uploading the file.',
+                                                  this.view.scrollToChatBottom);
             };
             fileReader.readAsArrayBuffer(file[0]);
           } else {
@@ -237,9 +239,11 @@ $(function () {
       this.sendMessageForm = $('#send-message');
       this.messageInput = this.sendMessageForm.find('textarea[name="message"]');
       this.fileInput = this.sendMessageForm.find('input[name="file"]');
-      this.fileNameField = $('#upload-file-name');
+      this.fileNameField = $('#upload-file-info');
+      this.fileInfoGroup = this.fileNameField.parent();
+      this.unlinkUploadFileButton = $('#unlink-file');
       this.downloadButtonClass = '.download';
-      this.sendMessageButton = this.sendMessageForm.find('#btn-send');
+      this.sendMessageButton = $('#btn-send');
       this.flashTemplate = $('#flash-template');
       this.channelsTemplate = $('#channels-template');
       this.membersTemplate = $('#members-template');
@@ -258,6 +262,7 @@ $(function () {
       this.renderChannels = this.renderChannels.bind(this);
       this.renderMembers = this.renderMembers.bind(this);
       this.renderMessages = this.renderMessages.bind(this);
+      this.scrollToChatBottom = this.scrollToChatBottom.bind(this);
       this.initialize();
     }
 
@@ -269,6 +274,7 @@ $(function () {
       this.onCloseMembersPane();
       this.onWindowResize();
       this.toggleUploadFileName();
+      this.unlinkUploadFile();
       this.validateSendMessageForm();
       this.resizeMessageInput();
       this.animatePaneChanging();
@@ -297,10 +303,14 @@ $(function () {
       this.chatContainer.outerHeight(height);
     }
 
+    scrollToChatBottom () {
+      this.messagesSection.scrollTop(this.messagesSection[0].scrollHeight);
+    }
+
     onWindowResize () {
       const optimizedResize = this.throttle(() => {
         this.setChatContainerHeight();
-        this.messagesSection.scrollTop(this.messagesSection[0].scrollHeight);
+        this.scrollToChatBottom();
       }, 150);
       $(window).on('resize', optimizedResize);
     }
@@ -314,14 +324,14 @@ $(function () {
       $('.alert').on('closed.bs.alert', handler);
     }
 
-    showFormFieldErrorMessage (field, error) {
+    showFormFieldErrorMessage (field, error, cb) {
       const nextSibling = field.next();
       if (nextSibling.hasClass('invalid-feedback')) {
         nextSibling.text(error);
       } else {
         $(`<div class="invalid-feedback">${error}</div>`).insertAfter(field);
       }
-      field.focus();
+      if (cb) cb();
     }
 
     removeFormFieldErrorMessage (field) {
@@ -427,7 +437,10 @@ $(function () {
     }
 
     calculateUploadFileSize(fileSize) {
-      return fileSize / Math.pow(1024, 2).toFixed(1);
+      if (fileSize < 1024) return `${fileSize.toFixed(1)}B`;
+      if (fileSize < Math.pow(1024, 2)) return `${(fileSize / 1024).toFixed(1)}KB`;
+      if (fileSize < Math.pow(1024, 3)) return `${(fileSize / Math.pow(1024, 2)).toFixed(1)}MB`;
+      return `${(fileSize / Math.pow(1024, 3)).toFixed(1)}GB`;
     }
 
     checkSendMessageForm (message, files) {
@@ -444,7 +457,7 @@ $(function () {
         }
         if (files[0].size > this.maxumumFileSize) {
           isValid = false;
-          errors.push(`File exceeded maximum size ${this.calculateUploadFileSize(this.maxumumFileSize)}MB.`);
+          errors.push(`File exceeded maximum size ${this.calculateUploadFileSize(this.maxumumFileSize)}.`);
         }
       }
       return { isValid: isValid, error: errors.length ? errors.join(' ') : '' };
@@ -476,18 +489,26 @@ $(function () {
       this.fileInput.on('change', function () {
         const files = $(this).prop('files');
         let html = '';
-        if (files.length > 0) html = `${files[0].name} - ${self.calculateUploadFileSize(files[0].size)}MB`;
+        if (files.length > 0) html = `${files[0].name} - ${self.calculateUploadFileSize(files[0].size)}`;
         self.fileNameField.html(html);
-        self.messagesSection.scrollTop(self.messagesSection[0].scrollHeight);
+        self.scrollToChatBottom();
+      });
+    }
+
+    unlinkUploadFile () {
+      this.unlinkUploadFileButton.on('click', () => {
+        this.fileInput.val('').change();
       });
     }
 
     validateSendMessageForm () {
-      this.sendMessageForm.on('change', () => {
+      this.sendMessageForm.on('input change', () => {
         const validation = this.checkSendMessageForm(this.messageInput.val(), this.fileInput.prop('files'));
         this.sendMessageButton.prop('disabled', !validation.isValid);
-        if (validation.error) this.showFormFieldErrorMessage(this.fileInput, validation.error);
-        else this.removeFormFieldErrorMessage(this.fileInput);
+        if (validation.error) {
+          this.showFormFieldErrorMessage(this.fileInfoGroup, validation.error, this.scrollToChatBottom);
+        }
+        else this.removeFormFieldErrorMessage(this.fileInfoGroup);
       });
     }
 
@@ -501,7 +522,7 @@ $(function () {
       const offset = this.messageInput[0].offsetHeight - this.messageInput[0].clientHeight;
       this.messageInput.on('input', function () {
         $(this).outerHeight('auto').outerHeight(this.scrollHeight + offset);
-        self.messagesSection.scrollTop(self.messagesSection[0].scrollHeight);
+        self.scrollToChatBottom();
       });
     }
 
@@ -510,7 +531,7 @@ $(function () {
       const html = template({ messages: messages, username: username });
       if (fromSendMessage) {
         this.messages.append(html);
-        this.messagesSection.scrollTop(this.messagesSection[0].scrollHeight);
+        this.scrollToChatBottom();
       } else if (fromScrollEvent) {
         const prevScrollTop = this.messagesSection.scrollTop();
         // variant without spinner
@@ -529,7 +550,7 @@ $(function () {
         }, 300);
       } else {
         this.messages.prepend(html);
-        this.messagesSection.scrollTop(this.messagesSection[0].scrollHeight);
+        this.scrollToChatBottom();
       }
       this.sendMessageForm.removeClass('d-none');
     }
@@ -551,7 +572,7 @@ $(function () {
       const html = template(messages);
       this.flashMessages.append(html);
       this.setChatContainerHeight();
-      this.messagesSection.scrollTop(this.messagesSection[0].scrollHeight);
+      this.scrollToChatBottom();
       this.onFlashMessageClosed();
       this.closeFlashMessages(messages.length);
     }

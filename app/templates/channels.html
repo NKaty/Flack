@@ -22,7 +22,7 @@
     <div class="chat-section channels tab-pane d-sm-block shadow-sm" id="channels-tab">
         <div class="fixed-header justify-content-center shadow">
             <h4>Channels</h4>
-            <div class="icon-button cursor-pointer" id="create-channel" data-toggle="modal"
+            <div class="icon-button" id="create-channel" data-toggle="modal"
                  data-target="#create-channel-modal">
                 <i class="fas fa-plus-circle"></i>
             </div>
@@ -40,16 +40,16 @@
     </div>
     <div class="chat-section messages d-sm-block shadow-sm tab-pane active" id="messages-tab">
         <div class="fixed-header justify-content-center shadow">
-            <div class="d-block d-sm-none toggle-pane cursor-pointer icon-button-arrow icon-button-absolute icon-button-left"
+            <div class="d-block d-sm-none toggle-pane icon-button-arrow icon-button-absolute icon-button-left"
                  data-toggle="tab" data-target="#channels-tab">
                 <i class="fas fa-arrow-left"></i>
             </div>
             <h4 id="channel-name-header">{{ user.current_channel.name if user.channel_id else 'Chat'}}</h4>
-            <div class="d-block d-sm-none toggle-pane cursor-pointer icon-button-arrow icon-button-absolute icon-button-right"
+            <div class="d-block d-sm-none toggle-pane icon-button-arrow icon-button-absolute icon-button-right"
                  data-toggle="tab" data-target="#members-tab">
                 <i class="fas fa-arrow-right"></i>
             </div>
-            <div class="d-none d-sm-block d-lg-none cursor-pointer icon-button icon-button-absolute icon-button-right"
+            <div class="d-none d-sm-block d-lg-none icon-button icon-button-absolute icon-button-right"
                  id="open-members">
                 <i class="fas fa-info-circle"></i>
             </div>
@@ -65,31 +65,36 @@
                 <p>Select channel or create your own channel to start messaging</p>
                 {% endif %}
             </div>
-            <form class="mx-3 mt-3 {{ 'd-none' if not user.channel_id }}" id="send-message">
-                <div class="d-flex">
-                    <div class="form-group upload">
+            <form class="mx-3 my-3 {{ 'd-none' if not user.channel_id }}" id="send-message">
+                <div class="d-flex align-items-end">
+                    <div class="form-group icon-button icon-button-send-message-form upload-field">
                         <input name="file" type="file">
                         <i class="fas fa-paperclip"></i>
                     </div>
                     <div class="form-group flex-grow-1 mx-2">
-                        <textarea name="message" class="form-control" rows="1"></textarea>
+                        <textarea name="message" class="form-control" rows="2"></textarea>
                     </div>
-                    <div id="btn-send" class="icon-button icon-button-send align-self-center">
+                    <button class="form-group icon-button icon-button-send-message-form" id="btn-send" disabled>
                         <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="d-flex align-items-center upload-file">
+                    <div class="upload-file-name flex-grow-1 mx-3" id="upload-file-info"></div>
+                    <div class="icon-button d-none" id="unlink-file">
+                        <i class="fas fa-times"></i>
                     </div>
                 </div>
-                <div class="upload-file-name" id="upload-file-name"></div>
             </form>
         </div>
     </div>
     <div class="chat-section members tab-pane d-lg-block shadow-sm" id="members-tab">
         <div class="fixed-header justify-content-center shadow">
-            <div class="d-block d-sm-none toggle-pane cursor-pointer icon-button-arrow icon-button-absolute icon-button-left"
+            <div class="d-block d-sm-none toggle-pane icon-button-arrow icon-button-absolute icon-button-left"
                  data-toggle="tab" data-target="#messages-tab">
                 <i class="fas fa-arrow-left"></i>
             </div>
             <h4>Members</h4>
-            <div class="d-none d-sm-block d-lg-none cursor-pointer icon-button icon-button-absolute icon-button-right"
+            <div class="d-none d-sm-block d-lg-none icon-button icon-button-absolute icon-button-right"
                  id="close-members">
                 <i class="fas fa-times-circle"></i>
             </div>
