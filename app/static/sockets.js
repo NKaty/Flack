@@ -239,8 +239,8 @@ $(function () {
       this.sendMessageForm = $('#send-message');
       this.messageInput = this.sendMessageForm.find('textarea[name="message"]');
       this.fileInput = this.sendMessageForm.find('input[name="file"]');
-      this.fileNameField = $('#upload-file-info');
-      this.fileInfoGroup = this.fileNameField.parent();
+      this.fileInfoField = $('#upload-file-info');
+      this.fileInfoGroup = this.fileInfoField.parent();
       this.unlinkUploadFileButton = $('#unlink-file');
       this.downloadButtonClass = '.download';
       this.sendMessageButton = $('#btn-send');
@@ -304,7 +304,10 @@ $(function () {
     }
 
     scrollToChatBottom () {
-      this.messagesSection.scrollTop(this.messagesSection[0].scrollHeight);
+      if ((this.messagesSection[0].scrollHeight - this.messagesSection[0].scrollTop -
+        this.messagesSection[0].clientHeight) !== 0) {
+        this.messagesSection.scrollTop(this.messagesSection[0].scrollHeight);
+      }
     }
 
     onWindowResize () {
@@ -490,7 +493,7 @@ $(function () {
         const files = $(this).prop('files');
         let html = '';
         if (files.length > 0) html = `${files[0].name} - ${self.calculateUploadFileSize(files[0].size)}`;
-        self.fileNameField.html(html);
+        self.fileInfoField.html(html);
         self.scrollToChatBottom();
       });
     }
@@ -514,6 +517,7 @@ $(function () {
 
     resetSendMessageForm () {
       this.sendMessageForm[0].reset();
+      this.fileInfoField.html('');
       this.sendMessageButton.prop('disabled', true);
     }
 

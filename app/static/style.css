@@ -105,7 +105,7 @@ textarea[name="message"] {
 
 .icon-button-send-message-form:disabled {
     color: #c7c8c9;
-    cursor: auto;
+    cursor: default;
 }
 
 .icon-button-download {
@@ -158,19 +158,25 @@ textarea[name="message"] {
     top: 0;
     left: 0;
     opacity: 0;
+    cursor: pointer !important;
 }
 
 .upload-file-name {
-    color: #d3dfea;
+    color: #f3eeee;
 }
 
 .upload-file-name:not(:empty) + .icon-button {
     display: block !important;
 }
 
-.upload-file-name:not(:empty):before {
-    content: ' Selected file: ';
-    font-family: FontAwesome;
+.upload-file-name:not(:empty)::before {
+    content: '\f15b  Selected file: ';
+    font-family: "Font Awesome 5 Pro", "Font Awesome 5 Free";
+    font-weight: 400;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
 }
 
 .form-wrapper {
