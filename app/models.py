@@ -1,4 +1,5 @@
 from datetime import datetime
+import hashlib
 
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -12,9 +13,15 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(64), nullable=False, unique=True, index=True)
     username = db.Column(db.String(64), nullable=False, unique=True)
     password_hash = db.Column(db.String(128), nullable=False)
-    channel_id = db.Column(db.Integer, db.ForeignKey('channels.id'))
+    avatar_hash = db.Column(db.String(32))
     is_connected = db.Column(db.Boolean, default=False, nullable=False)
+    channel_id = db.Column(db.Integer, db.ForeignKey('channels.id'))
     messages = db.relationship('Message', backref='author', lazy='dynamic')
+
+    def __init__(self, **kwargs):
+        super(User, self).__init__(**kwargs)
+        if self.email is not None and self.avatar_hash is None:
+            self.avatar_hash = self.gravatar_hash()
 
     @property
     def password(self):
@@ -26,6 +33,14 @@ class User(UserMixin, db.Model):
 
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def gravatar_hash(self):
+        return hashlib.md5(self.email.lower().encode('utf-8')).hexdigest()
+
+    def gravatar(self, size=20, default='identicon', rating='g'):
+        url = 'https://secure.gravatar.com/avatar'
+        avatar_hash = self.avatar_hash or self.gravatar_hash()
+        return f'{url}/{avatar_hash}?s={size}&d={default}&r={rating}'
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -39,9 +54,14 @@ def load_user(user_id):
 class Channel(db.Model):
     __tablename__ = 'channels'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), nullable=False, unique=True)
-    users = db.relationship('User', backref='current_channel', lazy='dynamic')
+    name = db.Column(db.String(20), nullable=False, unique=True)
+    description = db.Column(db.String(255), nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    users = db.relationship('User', foreign_keys=[User.channel_id], backref='current_channel',
+                            lazy='dynamic')
     messages = db.relationship('Message', backref='channel', lazy='dynamic')
+    creator = db.relationship('User', foreign_keys=[creator_id], backref='created_channels')
 
     def get_all_channel_messages(self, offset):
         messages = self.messages.order_by(Message.timestamp.desc()).offset(offset).limit(20).all()
@@ -65,7 +85,7 @@ class Message(db.Model):
     __tablename__ = 'messages'
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime, nullable=False, index=True, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     channel_id = db.Column(db.Integer, db.ForeignKey('channels.id'), nullable=False)
     file_id = db.Column(db.Integer, db.ForeignKey('files.id'))
@@ -88,6 +108,7 @@ class File(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(300), nullable=False)
     type = db.Column(db.String(128))
+    size = db.Column(db.Integer)
     content = db.Column(db.LargeBinary)
 
     def to_json(self):
