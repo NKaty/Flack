@@ -254,7 +254,8 @@ textarea[name="message"] {
     padding-left: 1em;
 }
 
-input:not([type="hidden"]) ~ .invalid-feedback {
+input:not([type="hidden"]) ~ .invalid-feedback,
+textarea:not([type="hidden"]) ~ .invalid-feedback {
     display: block;
 }
 

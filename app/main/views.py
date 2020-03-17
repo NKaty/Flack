@@ -108,14 +108,15 @@ def download_file(file_id):
 
 
 @socketio.on('create channel')
-def create_channel(channel):
-    form = CreateChannelForm(name=channel)
+def create_channel(data):
+    form = CreateChannelForm(name=data['name'], description=data['description'])
     if not form.validate():
         emit('flash', form.get_form_error_messages())
-    elif Channel.query.filter_by(name=channel).first():
+    elif Channel.query.filter_by(name=data['name']).first():
         emit('flash', [{'message': 'Channel with this name already exists.', 'category': 'danger'}])
     else:
-        new_channel = Channel(name=channel)
+        new_channel = Channel(name=data['name'], description=data['description'],
+                              creator_id=current_user.id)
         db.session.add(new_channel)
         db.session.commit()
         emit('load channels', {'channels': Channel.get_all_channels(offset=0), 'isReload': True},

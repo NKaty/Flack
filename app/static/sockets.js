@@ -239,7 +239,7 @@ $(function () {
       this.closeMembersButton = $('#close-members');
       this.createChannelModal = $('#create-channel-modal');
       this.channelNameInput = this.createChannelModal.find('input[name="channel"]');
-      this.channelDescriptionInput = this.createChannelModal.find('input[name="description"]');
+      this.channelDescriptionInput = this.createChannelModal.find('textarea[name="description"]');
       this.submitNewChannelButton = this.createChannelModal.find('#submit');
       this.sendMessageForm = $('#send-message');
       this.messageInput = this.sendMessageForm.find('textarea[name="message"]');

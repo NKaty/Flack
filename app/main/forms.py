@@ -52,7 +52,8 @@ class MessageForm(CustomForm):
 
 class CreateChannelForm(CustomForm):
     name = StringField('Channel name',
-                       validators=[DataRequired(), Length(1, 64),
+                       validators=[DataRequired(), Length(1, 20),
                                    Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,
                                           'Channel name must have only letters, numbers, '
                                           'dots or underscores.')])
+    description = TextAreaField('Short description', validators=[DataRequired(), Length(1, 255)])
