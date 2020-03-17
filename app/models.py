@@ -37,7 +37,7 @@ class User(UserMixin, db.Model):
     def gravatar_hash(self):
         return hashlib.md5(self.email.lower().encode('utf-8')).hexdigest()
 
-    def gravatar(self, size=20, default='identicon', rating='g'):
+    def gravatar(self, size=30, default='identicon', rating='g'):
         url = 'https://secure.gravatar.com/avatar'
         avatar_hash = self.avatar_hash or self.gravatar_hash()
         return f'{url}/{avatar_hash}?s={size}&d={default}&r={rating}'
@@ -96,6 +96,7 @@ class Message(db.Model):
             'text': self.text,
             'file': {'id': self.file_id, 'name': self.file.name} if self.file_id else None,
             'author': self.author.username,
+            'avatar': self.author.avatar_hash or self.author.gravatar(),
             'timestamp': self.timestamp.strftime('%Y-%m-%d %H:%M:%S')
         }
 

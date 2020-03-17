@@ -165,20 +165,23 @@
 
 <script id="messages-template" type="text/x-handlebars-template">
     {{#each messages}}
-    <div class="message card bg-light my-1 border-white {{#if_eq author ../username}}ml-auto{{else}}mr-auto{{/if_eq}}">
-        <div class="header d-flex w-100 justify-content-between">
-            <h6 class="lead">{{author}}</h6>
-            <small class="text-secondary">{{date timestamp 'format' 'DD/MM/YY HH:mm'}}</small>
-        </div>
-        <div>{{breaklines text}}</div>
-        {{#if file}}
-        <div class="d-flex align-items-center mt-1">
-            <div class="icon-button icon-button-download cursor-pointer download" data-file_id="{{file.id}}">
-                <i class="fas fa-file-download"></i>
+    <div class="message media bg-light my-1 {{#if_eq author ../username}}ml-auto{{else}}mr-auto{{/if_eq}}">
+        <img class="avatar mr-3" src="{{avatar}}" alt="avatar">
+        <div class="media-body">
+            <div class="d-flex justify-content-between">
+                <h6 class="lead mr-3 message-username">{{author}}</h6>
+                <small class="text-secondary text-nowrap">{{date timestamp 'format' 'DD/MM/YY HH:mm'}}</small>
             </div>
-            <small>{{file.name}}</small>
+            <div>{{breaklines text}}</div>
+            {{#if file}}
+            <div class="d-flex align-items-center mt-1">
+                <div class="icon-button icon-button-download cursor-pointer download" data-file_id="{{file.id}}">
+                    <i class="fas fa-file-download"></i>
+                </div>
+                <small>{{file.name}}</small>
+            </div>
+            {{/if}}
         </div>
-        {{/if}}
     </div>
     {{/each}}
 </script>

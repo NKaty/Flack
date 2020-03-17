@@ -75,7 +75,19 @@
 .message {
     padding: 1em;
     width: 90%;
+    border: 1px solid #fff;
+    border-radius: 0.25rem;
     opacity: 0.7;
+    overflow: hidden;
+}
+
+.avatar {
+    height: 30px;
+    width: 30px;
+}
+
+.message-username {
+    color: #6f42c1;
 }
 
 textarea[name="message"] {
