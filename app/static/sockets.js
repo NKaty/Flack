@@ -194,9 +194,13 @@ $(function () {
 
     initializeChannelCreateEvent () {
       this.view.submitNewChannelButton.on('click', () => {
-        const channel = this.view.channelInput.val();
-        if (this.view.checkChannelCreateForm(channel).isValid) {
-          this.socket.emit('create channel', channel);
+        const channelName = this.view.channelNameInput.val();
+        const channelDescription = this.view.channelDescriptionInput.val();
+        if (this.view.checkChannelCreateForm(channelName, channelDescription).isValid) {
+          this.socket.emit('create channel', {
+            name: channelName,
+            description: channelDescription
+          });
           this.view.createChannelModal.modal('hide');
         }
       });
@@ -234,7 +238,8 @@ $(function () {
       this.toggleMembersButton = $('#open-members');
       this.closeMembersButton = $('#close-members');
       this.createChannelModal = $('#create-channel-modal');
-      this.channelInput = this.createChannelModal.find('input[name="channel"]');
+      this.channelNameInput = this.createChannelModal.find('input[name="channel"]');
+      this.channelDescriptionInput = this.createChannelModal.find('input[name="description"]');
       this.submitNewChannelButton = this.createChannelModal.find('#submit');
       this.sendMessageForm = $('#send-message');
       this.messageInput = this.sendMessageForm.find('textarea[name="message"]');
@@ -430,16 +435,20 @@ $(function () {
       }
     }
 
-    checkChannelCreateForm (channelName) {
-      let isValid = channelName.length > 0 && channelName.length < 65 &&
+    checkChannelCreateForm (channelName, channelDescription) {
+      const errors = { name: '', description: '' };
+      const isNameValid = channelName.length > 0 && channelName.length < 21 &&
         /^[A-Za-z][A-Za-z0-9_.]*$/.test(channelName);
+      errors.name = isNameValid ? '' : 'Channel name must be between 1 and 20 characters long and have only letters, numbers, dots or underscores.';
+      const isDescriptionValid = channelDescription.length > 0 && channelDescription.length < 255;
+      errors.description = isDescriptionValid ? '' : 'Channel description must be between 1 and 255 characters long';
       return {
-        isValid: isValid,
-        error: isValid ? '' : 'Channel name must be between 1 and 64 characters long and have only letters, numbers, dots or underscores.'
+        isValid: isNameValid && isDescriptionValid,
+        errors: errors
       };
     }
 
-    calculateUploadFileSize(fileSize) {
+    calculateUploadFileSize (fileSize) {
       const units = ['', 'B', 'KB', 'MB', 'GB'];
       let size = fileSize;
       let bytes = 1024;
@@ -448,7 +457,7 @@ $(function () {
         size = (fileSize / bytes).toFixed(1);
         bytes *= 1024;
       }
-      return `${size}${units[4]}`
+      return `${size}${units[4]}`;
     }
 
     checkSendMessageForm (message, files) {
@@ -473,13 +482,19 @@ $(function () {
 
     channelCreateFormOpen () {
       this.createChannelModal.on('shown.bs.modal', () => {
-        this.channelInput.focus();
+        this.channelNameInput.focus();
         this.submitNewChannelButton.prop('disabled', true);
-        this.channelInput.on('keyup', () => {
-          const validation = this.checkChannelCreateForm(this.channelInput.val());
+        this.createChannelModal.on('input', () => {
+          const channelName = this.channelNameInput.val();
+          const channelDescription = this.channelDescriptionInput.val();
+          const validation = this.checkChannelCreateForm(channelName, channelDescription);
           this.submitNewChannelButton.prop('disabled', !validation.isValid);
-          if (validation.error) this.showFormFieldErrorMessage(this.channelInput, validation.error);
-          else this.removeFormFieldErrorMessage(this.channelInput);
+          if (validation.errors.name && channelName.length) {
+            this.showFormFieldErrorMessage(this.channelNameInput, validation.errors.name);
+          } else this.removeFormFieldErrorMessage(this.channelNameInput);
+          if (validation.errors.description && channelDescription.length) {
+            this.showFormFieldErrorMessage(this.channelDescriptionInput, validation.errors.description);
+          } else this.removeFormFieldErrorMessage(this.channelDescriptionInput);
         });
       });
     }
@@ -487,7 +502,8 @@ $(function () {
     channelCreateFormClose () {
       this.createChannelModal.on('hidden.bs.modal', () => {
         this.submitNewChannelButton.prop('disabled', true);
-        this.removeFormFieldErrorMessage(this.channelInput);
+        this.removeFormFieldErrorMessage(this.channelNameInput);
+        this.removeFormFieldErrorMessage(this.channelDescriptionInput);
         this.createChannelModal.find('form')[0].reset();
       });
     }
@@ -515,8 +531,7 @@ $(function () {
         this.sendMessageButton.prop('disabled', !validation.isValid);
         if (validation.error) {
           this.showFormFieldErrorMessage(this.fileInfoGroup, validation.error, this.scrollToChatBottom);
-        }
-        else this.removeFormFieldErrorMessage(this.fileInfoGroup);
+        } else this.removeFormFieldErrorMessage(this.fileInfoGroup);
       });
     }
 
