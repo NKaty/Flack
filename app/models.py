@@ -94,7 +94,8 @@ class Message(db.Model):
     def to_json(self):
         return {
             'text': self.text,
-            'file': {'id': self.file_id, 'name': self.file.name} if self.file_id else None,
+            'file': {'id': self.file_id, 'name': self.file.name,
+                     'size': self.file.convert_file_size()} if self.file_id else None,
             'author': self.author.username,
             'avatar': self.author.avatar_hash or self.author.gravatar(),
             'timestamp': self.timestamp.strftime('%Y-%m-%d %H:%M:%S')
@@ -111,6 +112,19 @@ class File(db.Model):
     type = db.Column(db.String(128))
     size = db.Column(db.Integer)
     content = db.Column(db.LargeBinary)
+
+    def convert_file_size(self):
+        if self.size is not None:
+            units = ['', 'B', 'KB', 'MB', 'GB']
+            size = self.size
+            bytes_ = 1024
+            for i in range(1, 4):
+                if self.size < bytes_:
+                    return f'{size}{units[i]}'
+                size = round(self.size / bytes_, 1)
+                bytes_ *= 1024
+            return f'{size}{units[4]}'
+        return ''
 
     def to_json(self):
         return {

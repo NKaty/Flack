@@ -83,7 +83,9 @@ def send_message(data):
             }
             if bool(data['file']):
                 file = data['file']
-                message_dict['file'] = File(name=file['name'], content=file['content'],
+                message_dict['file'] = File(name=file['name'],
+                                            content=file['content'],
+                                            size=file['size'],
                                             type=file['type'] if len(file['type']) else None)
                 db.session.add(message_dict['file'])
             message = Message(**message_dict)

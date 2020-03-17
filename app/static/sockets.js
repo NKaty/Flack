@@ -440,10 +440,15 @@ $(function () {
     }
 
     calculateUploadFileSize(fileSize) {
-      if (fileSize < 1024) return `${fileSize.toFixed(1)}B`;
-      if (fileSize < Math.pow(1024, 2)) return `${(fileSize / 1024).toFixed(1)}KB`;
-      if (fileSize < Math.pow(1024, 3)) return `${(fileSize / Math.pow(1024, 2)).toFixed(1)}MB`;
-      return `${(fileSize / Math.pow(1024, 3)).toFixed(1)}GB`;
+      const units = ['', 'B', 'KB', 'MB', 'GB'];
+      let size = fileSize;
+      let bytes = 1024;
+      for (let i = 1; i < 4; i++) {
+        if (fileSize < bytes) return `${size}${units[i]}`;
+        size = (fileSize / bytes).toFixed(1);
+        bytes *= 1024;
+      }
+      return `${size}${units[4]}`
     }
 
     checkSendMessageForm (message, files) {
