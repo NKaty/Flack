@@ -22,8 +22,8 @@
     <div class="chat-section channels tab-pane d-sm-block shadow-sm" id="channels-tab">
         <div class="fixed-header justify-content-center shadow">
             <h4>Channels</h4>
-            <div class="icon-button" id="create-channel" data-toggle="modal"
-                 data-target="#create-channel-modal">
+            <div class="icon-button" id="create-channel" data-toggle="modal" data-target="#create-channel-modal"
+                 data-tooltip="tooltip" title="Create new channel">
                 <i class="fas fa-plus-circle"></i>
             </div>
             <div class="d-block d-sm-none toggle-pane icon-button-arrow icon-button-absolute icon-button-right"
@@ -50,7 +50,7 @@
                 <i class="fas fa-arrow-right"></i>
             </div>
             <div class="d-none d-sm-block d-lg-none icon-button icon-button-absolute icon-button-right"
-                 id="open-members">
+                 id="open-members" data-tooltip="tooltip" title="Toggle info panel">
                 <i class="fas fa-info-circle"></i>
             </div>
         </div>
@@ -96,7 +96,7 @@
             </div>
             <h4>Members</h4>
             <div class="d-none d-sm-block d-lg-none icon-button icon-button-absolute icon-button-right"
-                 id="close-members">
+                 id="close-members" data-tooltip="tooltip" title="Close info panel">
                 <i class="fas fa-times-circle"></i>
             </div>
         </div>

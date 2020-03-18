@@ -226,6 +226,7 @@ $(function () {
   class View {
     constructor () {
       this.flashMessages = $('#flash-messages');
+      this.tooltips = $('[data-tooltip="tooltip"]');
       this.channels = $('#channels');
       this.messages = $('#messages');
       this.members = $('#members');
@@ -273,6 +274,7 @@ $(function () {
 
     initialize () {
       this.handlebarsHelpers();
+      this.initializeTooltips();
       this.setChatContainerHeight();
       this.togglePane();
       this.onToggleMembersPane();
@@ -299,6 +301,10 @@ $(function () {
         text = text.replace(/(\r\n|\n|\r)/gm, '<br>');
         return new Handlebars.SafeString(text);
       });
+    }
+
+    initializeTooltips () {
+      this.tooltips.tooltip();
     }
 
     setChatContainerHeight () {

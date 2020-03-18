@@ -9,7 +9,6 @@
 }
 
 .chat-container {
-    color: #2f2f30;
     display: flex;
     overflow: hidden;
     position: relative;
@@ -252,6 +251,15 @@ textarea[name="message"] {
 .input-icon-wrapper > input:focus + .input-icon {
     color: #17a2b8;
     padding-left: 1em;
+}
+
+.tooltip-inner {
+    background-color: #3a464e;
+}
+
+.bs-tooltip-auto[x-placement^=bottom] .arrow::before,
+.bs-tooltip-bottom .arrow::before {
+    border-bottom-color: #3a464e;
 }
 
 input:not([type="hidden"]) ~ .invalid-feedback,
