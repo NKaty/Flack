@@ -94,12 +94,14 @@
                  data-toggle="tab" data-target="#messages-tab">
                 <i class="fas fa-arrow-left"></i>
             </div>
-            <h4>Members</h4>
+            <h4>Channel info</h4>
             <div class="d-none d-sm-block d-lg-none icon-button icon-button-absolute icon-button-right"
                  id="close-members" data-tooltip="tooltip" title="Close info panel">
                 <i class="fas fa-times-circle"></i>
             </div>
         </div>
+        <div id="channel-info"></div>
+        <h5>Active members</h5>
         <ul id="members" class="items-list"></ul>
         <div id="members-sentinel" class="sentinel d-flex justify-content-center mt-2">
             <!--            <div class="spinner-border text-secondary" id="members-spinner" role="status">-->
@@ -161,6 +163,15 @@
         {{this}}
     </li>
     {{/each}}
+</script>
+
+<script id="info-template" type="text/x-handlebars-template">
+    <h5>Channels details</h5>
+    <h6>Name</h6>
+    <p>{{name}}</p>
+    <h6>Description</h6>
+    <p>{{description}}</p>
+    <p>Created by {{creator}} on {{date timestamp 'format' 'LL'}}</p>
 </script>
 
 <script id="members-template" type="text/x-handlebars-template">

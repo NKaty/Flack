@@ -30,6 +30,7 @@ def connect():
     if current_user.channel_id is not None:
         emit('set initial info', {'channel': current_user.current_channel.name,
                                   'username': current_user.username})
+        # emit('load channel information', current_user.current_channel.to_json())
 
 
 @socketio.on('disconnect')
@@ -65,6 +66,7 @@ def joined(channel):
         emit('load members', {'members': Channel.query.filter_by(
             name=previous_channel).first().get_all_channel_members(offset=0), 'isReload': True},
              room=previous_channel)
+    emit('load channel information', current_user.current_channel.to_json())
     emit('load members',
          {'members': current_user.current_channel.get_all_channel_members(offset=0),
           'isReload': True}, room=current_user.current_channel.name)

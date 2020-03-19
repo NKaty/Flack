@@ -63,6 +63,11 @@ class Channel(db.Model):
     messages = db.relationship('Message', backref='channel', lazy='dynamic')
     creator = db.relationship('User', foreign_keys=[creator_id], backref='created_channels')
 
+    @staticmethod
+    def get_all_channels(offset):
+        channels = Channel.query.order_by(Channel.name.asc()).offset(offset).limit(10).all()
+        return [channel.name for channel in channels]
+
     def get_all_channel_messages(self, offset):
         messages = self.messages.order_by(Message.timestamp.desc()).offset(offset).limit(20).all()
         return [message.to_json() for message in messages[::-1]]
@@ -72,10 +77,14 @@ class Channel(db.Model):
             offset).limit(1).all()
         return [member.username for member in members]
 
-    @staticmethod
-    def get_all_channels(offset):
-        channels = Channel.query.order_by(Channel.name.asc()).offset(offset).limit(10).all()
-        return [channel.name for channel in channels]
+    def to_json(self):
+        print(self.creator)
+        return {
+            'name': self.name,
+            'description': self.description,
+            'creator': self.creator.username,
+            'timestamp': self.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        }
 
     def __repr__(self):
         return f'<Channel {self.name}>'

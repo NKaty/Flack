@@ -73,6 +73,7 @@ $(function () {
       this.socket.on('load channels', data => this.channels.onLoad(data.channels, data.isReload,
                                                                    this.activeChannel));
       this.socket.on('load members', data => this.members.onLoad(data.members, data.isReload));
+      this.socket.on('load channel information', info => this.onLoadChannelInformation(info));
       this.socket.on('flash', messages => this.view.showFlashMessages(messages));
     }
 
@@ -130,6 +131,10 @@ $(function () {
         this.isFirstConnect = false;
       }
       this.socket.emit('joined', this.activeChannel);
+    }
+
+    onLoadChannelInformation (info) {
+      this.view.renderChannelInformation(info);
     }
 
     initializeChannelChangeEvent () {
@@ -229,6 +234,7 @@ $(function () {
       this.tooltips = $('[data-tooltip="tooltip"]');
       this.channels = $('#channels');
       this.messages = $('#messages');
+      this.channelInfo = $('#channel-info');
       this.members = $('#members');
       this.messagesSection = this.messages.closest('.chat-section');
       this.channelsSection = this.channels.closest('.chat-section');
@@ -252,6 +258,7 @@ $(function () {
       this.sendMessageButton = $('#btn-send');
       this.flashTemplate = $('#flash-template');
       this.channelsTemplate = $('#channels-template');
+      this.channelInfoTemplate = $('#info-template');
       this.membersTemplate = $('#members-template');
       this.messagesTemplate = $('#messages-template');
       this.logoutButton = $('#logout');
@@ -583,6 +590,12 @@ $(function () {
         this.scrollToChatBottom();
       }
       this.sendMessageForm.removeClass('d-none');
+    }
+
+    renderChannelInformation (info) {
+      const template = Handlebars.compile(this.channelInfoTemplate.html());
+      const html = template(info);
+      this.channelInfo.append(html);
     }
 
     renderMembers (members) {
