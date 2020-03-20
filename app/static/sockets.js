@@ -595,7 +595,7 @@ $(function () {
     renderChannelInformation (info) {
       const template = Handlebars.compile(this.channelInfoTemplate.html());
       const html = template(info);
-      this.channelInfo.append(html);
+      this.channelInfo.html('').append(html);
     }
 
     renderMembers (members) {
