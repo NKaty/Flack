@@ -6,6 +6,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from . import db, login_manager
 
+pins = db.Table('pins',
+                db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+                db.Column('channel_id', db.Integer, db.ForeignKey('channels.id'), primary_key=True))
+
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -17,6 +21,8 @@ class User(UserMixin, db.Model):
     is_connected = db.Column(db.Boolean, default=False, nullable=False)
     channel_id = db.Column(db.Integer, db.ForeignKey('channels.id'))
     messages = db.relationship('Message', backref='author', lazy='dynamic')
+    pinned_channels = db.relationship('Channel', secondary=pins, lazy='dynamic',
+                                      backref=db.backref('pinned_by', lazy='dynamic'))
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -78,7 +84,6 @@ class Channel(db.Model):
         return [member.username for member in members]
 
     def to_json(self):
-        print(self.creator)
         return {
             'name': self.name,
             'description': self.description,
