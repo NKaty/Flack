@@ -66,12 +66,12 @@
     width: max-content;
 }
 
-.channel-active {
+.channel-items-list .channel-name:hover {
     color: #fff;
 }
 
-.channel-unpinned {
-    transform: scale(-1);
+.channel-active {
+    color: #fff;
 }
 
 .modal-dialog {
@@ -136,6 +136,25 @@ textarea[name="message"] {
 
 .icon-button-download:hover {
     color: #388393;
+}
+
+.icon-button-pin {
+    font-size: 0.8em;
+    color: #3a464e;
+}
+
+.icon-button-pin:hover {
+    color: #000;
+}
+
+.icon-button-unpin {
+    font-size: 0.8em;
+    color: #d3dfea;
+    transform: scale(-1);
+}
+
+.icon-button-unpin:hover {
+    color: #fff;
 }
 
 .icon-button-arrow {

@@ -232,7 +232,7 @@ $(function () {
   class View {
     constructor () {
       this.flashMessages = $('#flash-messages');
-      this.tooltips = $('[data-tooltip="tooltip"]');
+      this.tooltipSelector = '[data-tooltip="tooltip"]';
       this.channels = $('#channels');
       this.messages = $('#messages');
       this.channelInfo = $('#channel-info');
@@ -283,7 +283,7 @@ $(function () {
 
     initialize () {
       this.handlebarsHelpers();
-      this.initializeTooltips();
+      this.initializeTooltips(this.tooltipSelector);
       this.setChatContainerHeight();
       this.togglePane();
       this.onToggleMembersPane();
@@ -312,8 +312,8 @@ $(function () {
       });
     }
 
-    initializeTooltips () {
-      this.tooltips.tooltip();
+    initializeTooltips (tooltips) {
+      $(tooltips).tooltip();
     }
 
     setChatContainerHeight () {
@@ -371,8 +371,8 @@ $(function () {
     }
 
     setChannelActive (channel) {
-      $(channel).addClass('channel-active').siblings().removeClass('channel-active');
-      this.channelNameHeader.html($(channel).html());
+      channel.addClass('channel-active').siblings().removeClass('channel-active');
+      this.channelNameHeader.html(channel.find(this.channelNameClass).html());
       if (this.toggleChannelPaneButton.css('display') !== 'none') this.toggleChannelPaneButton.tab('show');
     }
 
@@ -610,6 +610,7 @@ $(function () {
       const template = Handlebars.compile(this.channelsTemplate.html());
       const html = template({ channels: channels, activeChannel: activeChannel });
       this.channels.append(html);
+      this.initializeTooltips(this.channels.find(this.tooltipSelector));
     }
 
     showFlashMessages (messages) {
