@@ -48,6 +48,24 @@ class User(UserMixin, db.Model):
         avatar_hash = self.avatar_hash or self.gravatar_hash()
         return f'{url}/{avatar_hash}?s={size}&d={default}&r={rating}'
 
+    def get_all_channels(self, offset):
+        limit = 10
+        pinned_channels = self.pinned_channels.order_by(Channel.name.asc()).all()
+        pinned_channels_len = len(pinned_channels)
+        if pinned_channels_len >= offset + limit:
+            return [{'name': channel.name, 'pinned': True} for channel in
+                    pinned_channels[offset:offset + limit]]
+        if offset >= pinned_channels_len:
+            channels = Channel.query.filter(
+                Channel.id.notin_([channel.id for channel in pinned_channels])).order_by(
+                Channel.name.asc()).offset(offset - pinned_channels_len).limit(limit).all()
+            return [{'name': channel.name, 'pinned': False} for channel in channels]
+        channels = Channel.query.filter(
+            Channel.id.notin_([channel.id for channel in pinned_channels])).order_by(
+            Channel.name.asc()).limit(limit - (pinned_channels_len - offset)).all()
+        return [{'name': channel.name, 'pinned': True} for channel in pinned_channels[offset:]] + [
+            {'name': channel.name, 'pinned': False} for channel in channels]
+
     def __repr__(self):
         return f'<User {self.username}>'
 
@@ -69,10 +87,10 @@ class Channel(db.Model):
     messages = db.relationship('Message', backref='channel', lazy='dynamic')
     creator = db.relationship('User', foreign_keys=[creator_id], backref='created_channels')
 
-    @staticmethod
-    def get_all_channels(offset):
-        channels = Channel.query.order_by(Channel.name.asc()).offset(offset).limit(10).all()
-        return [channel.name for channel in channels]
+    # @staticmethod
+    # def get_all_channels(offset):
+    #     channels = Channel.query.order_by(Channel.name.asc()).offset(offset).limit(10).all()
+    #     return [channel.name for channel in channels]
 
     def get_all_channel_messages(self, offset):
         messages = self.messages.order_by(Message.timestamp.desc()).offset(offset).limit(20).all()

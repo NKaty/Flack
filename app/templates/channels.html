@@ -164,8 +164,13 @@
 
 <script id="channels-template" type="text/x-handlebars-template">
     {{#each channels}}
-    <li class="{{#if_eq this ../activeChannel}}channel-active{{/if_eq}}" data-channel="{{this}}">
-        {{this}}
+    <li class="{{#if_eq name ../activeChannel}}channel-active{{/if_eq}}" data-channel="{{name}}"
+        data-pinned="{{pinned}}">
+        <i class="fas fa-thumbtack {{#unless pinned}}channel-unpinned{{/unless}}"></i>
+        <div class="channel-name d-inline-block">
+            {{name}}
+        </div>
+
     </li>
     {{/each}}
 </script>

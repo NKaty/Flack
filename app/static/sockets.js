@@ -139,14 +139,15 @@ $(function () {
 
     initializeChannelChangeEvent () {
       const self = this;
-      this.view.channels.on('click', 'li', function () {
-        if (self.view.isChannelActive(this)) return;
+      this.view.channels.on('click', this.view.channelNameClass, function () {
+        const newActiveChannel = $(this).parent();
+        if (self.view.isChannelActive(newActiveChannel)) return;
         self.resetAtChannelChanged();
         self.socket.emit('left', self.activeChannel);
-        self.activeChannel = self.view.getDataAttributeChannel(this);
+        self.activeChannel = self.view.getDataAttributeChannel(newActiveChannel);
         self.socket.emit('joined', self.activeChannel);
         self.socket.emit('get messages', self.messages.loadedNumber, false);
-        self.view.setChannelActive(this);
+        self.view.setChannelActive(newActiveChannel);
       });
     }
 
@@ -239,6 +240,7 @@ $(function () {
       this.messagesSection = this.messages.closest('.chat-section');
       this.channelsSection = this.channels.closest('.chat-section');
       this.membersSection = this.members.closest('.chat-section');
+      this.channelNameClass = '.channel-name';
       this.channelNameHeader = $('#channel-name-header');
       this.togglePaneButtons = $('.toggle-pane');
       this.toggleChannelPaneButton = $('.toggle-pane[data-target="#messages-tab"]');

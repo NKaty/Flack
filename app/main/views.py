@@ -140,7 +140,8 @@ def get_messages(offset, from_scroll_event):
 @socketio.on('get channels')
 @authenticated_only
 def get_channels(offset):
-    emit('load channels', {'channels': Channel.get_all_channels(offset=offset), 'isReload': False})
+    emit('load channels', {'channels': current_user.get_all_channels(offset=offset), 'isReload': False})
+    # emit('load channels', {'channels': Channel.get_all_channels(offset=offset), 'isReload': False})
     # print('get channels emit', current_user.username, offset)
 
 
