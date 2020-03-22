@@ -141,21 +141,20 @@ $(function () {
     initializeChannelChangeEvent () {
       const self = this;
       this.view.channels.on('click', this.view.channelNameClass, function () {
-        const newActiveChannelItem = $(this).parent();
-        if (self.view.isChannelActive(newActiveChannelItem)) return;
-        self.resetAtChannelChanged();
-        self.socket.emit('left', self.activeChannel);
-        self.activeChannel = self.view.getDataAttributeChannel(newActiveChannelItem);
-        self.socket.emit('joined', self.activeChannel);
-        self.socket.emit('get messages', self.messages.loadedNumber, false);
-        self.view.setChannelActive(newActiveChannelItem);
+        const newActiveChannel = self.view.setChannelActive(this);
+        if (newActiveChannel) {
+          self.resetAtChannelChanged();
+          self.socket.emit('left', self.activeChannel);
+          self.activeChannel = newActiveChannel;
+          self.socket.emit('joined', self.activeChannel);
+          self.socket.emit('get messages', self.messages.loadedNumber, false);
+        }
       });
     }
 
     resetAtChannelChanged () {
       this.messages.loadedNumber = 0;
       this.messages.allLoaded = false;
-      this.view.displaySpinner(this.view.messagesSpinner);
     }
 
     initializeToggleChannelPinEvent () {
@@ -384,22 +383,22 @@ $(function () {
       return $(channel).hasClass('channel-active');
     }
 
-    setChannelActive (channel) {
-      channel.addClass('channel-active').siblings().removeClass('channel-active');
-      this.channelNameHeader.html(channel.find(this.channelNameClass).html());
+    setChannelActive (channelName) {
+      const newActiveChannelItem = $(channelName).parent();
+      if (this.isChannelActive(newActiveChannelItem)) return;
+      this.displaySpinner(this.messagesSpinner);
+      newActiveChannelItem.addClass('channel-active').siblings().removeClass('channel-active');
+      this.channelNameHeader.html(newActiveChannelItem.find(this.channelNameClass).html());
       if (this.toggleChannelPaneButton.css('display') !== 'none') this.toggleChannelPaneButton.tab('show');
+      return newActiveChannelItem.data('channel');
     }
 
     getChannelPinData (channelPinIcon) {
       const channelItem = $(channelPinIcon).parent();
-      const actionToPin = !$(channelItem).data('pinned');
-      const channel = $(channelItem).data('channel');
+      const actionToPin = !channelItem.data('pinned');
+      const channel = channelItem.data('channel');
       this.hideTooltips();
       return { channel: channel, actionToPin: actionToPin };
-    }
-
-    getDataAttributeChannel (elem) {
-      return $(elem).data('channel');
     }
 
     getDataAttributeFile (elem) {
