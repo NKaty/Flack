@@ -81,6 +81,7 @@ $(function () {
       if (this.isFirstConnect) {
         this.initializeScrollComponents();
         this.initializeChannelChangeEvent();
+        this.initializeToggleChannelPinEvent();
         this.initializeMessageSendEvent();
         this.initializeDownloadFileEvent();
         this.initializeChannelCreateEvent();
@@ -140,14 +141,14 @@ $(function () {
     initializeChannelChangeEvent () {
       const self = this;
       this.view.channels.on('click', this.view.channelNameClass, function () {
-        const newActiveChannel = $(this).parent();
-        if (self.view.isChannelActive(newActiveChannel)) return;
+        const newActiveChannelItem = $(this).parent();
+        if (self.view.isChannelActive(newActiveChannelItem)) return;
         self.resetAtChannelChanged();
         self.socket.emit('left', self.activeChannel);
-        self.activeChannel = self.view.getDataAttributeChannel(newActiveChannel);
+        self.activeChannel = self.view.getDataAttributeChannel(newActiveChannelItem);
         self.socket.emit('joined', self.activeChannel);
         self.socket.emit('get messages', self.messages.loadedNumber, false);
-        self.view.setChannelActive(newActiveChannel);
+        self.view.setChannelActive(newActiveChannelItem);
       });
     }
 
@@ -155,6 +156,14 @@ $(function () {
       this.messages.loadedNumber = 0;
       this.messages.allLoaded = false;
       this.view.displaySpinner(this.view.messagesSpinner);
+    }
+
+    initializeToggleChannelPinEvent () {
+      const self = this;
+      this.view.channels.on('click', this.view.channelPinIconClass, function () {
+        const { channel, actionToPin } = self.view.getChannelPinData(this);
+        self.socket.emit('toggle channel pin', channel, actionToPin);
+      });
     }
 
     initializeMessageSendEvent () {
@@ -241,6 +250,7 @@ $(function () {
       this.channelsSection = this.channels.closest('.chat-section');
       this.membersSection = this.members.closest('.chat-section');
       this.channelNameClass = '.channel-name';
+      this.channelPinIconClass = '.channel-pin-icon';
       this.channelNameHeader = $('#channel-name-header');
       this.togglePaneButtons = $('.toggle-pane');
       this.toggleChannelPaneButton = $('.toggle-pane[data-target="#messages-tab"]');
@@ -316,6 +326,10 @@ $(function () {
       $(tooltips).tooltip();
     }
 
+    hideTooltips (tooltips = this.tooltipSelector) {
+      $(tooltips).tooltip('hide');
+    }
+
     setChatContainerHeight () {
       const height = $(window).height() - this.navbar.outerHeight(true) -
         this.flashMessages.outerHeight(true) -
@@ -374,6 +388,14 @@ $(function () {
       channel.addClass('channel-active').siblings().removeClass('channel-active');
       this.channelNameHeader.html(channel.find(this.channelNameClass).html());
       if (this.toggleChannelPaneButton.css('display') !== 'none') this.toggleChannelPaneButton.tab('show');
+    }
+
+    getChannelPinData (channelPinIcon) {
+      const channelItem = $(channelPinIcon).parent();
+      const actionToPin = !$(channelItem).data('pinned');
+      const channel = $(channelItem).data('channel');
+      this.hideTooltips();
+      return { channel: channel, actionToPin: actionToPin };
     }
 
     getDataAttributeChannel (elem) {

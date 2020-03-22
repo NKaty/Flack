@@ -121,10 +121,28 @@ def create_channel(data):
                               creator_id=current_user.id)
         db.session.add(new_channel)
         db.session.commit()
-        emit('load channels', {'channels': Channel.get_all_channels(offset=0), 'isReload': True},
+        emit('load channels',
+             {'channels': current_user.get_all_channels(offset=0), 'isReload': True},
              broadcast=True)
         emit('flash',
              [{'message': 'Channel has been successfully created.', 'category': 'success'}])
+
+
+@socketio.on('toggle channel pin')
+@authenticated_only
+def toggle_channel_pin(channel_name, action_to_pin):
+    channel = Channel.query.filter_by(name=channel_name).first()
+    if channel:
+        if action_to_pin:
+            current_user.pinned_channels.append(channel)
+        else:
+            current_user.pinned_channels.remove(channel)
+        db.session.add(current_user._get_current_object())
+        db.session.commit()
+        emit('load channels',
+             {'channels': current_user.get_all_channels(offset=0), 'isReload': True})
+    else:
+        emit('flash', [{'message': "Channel with this name doesn't exist.", 'category': 'danger'}])
 
 
 @socketio.on('get messages')
@@ -140,7 +158,8 @@ def get_messages(offset, from_scroll_event):
 @socketio.on('get channels')
 @authenticated_only
 def get_channels(offset):
-    emit('load channels', {'channels': current_user.get_all_channels(offset=offset), 'isReload': False})
+    emit('load channels',
+         {'channels': current_user.get_all_channels(offset=offset), 'isReload': False})
     # emit('load channels', {'channels': Channel.get_all_channels(offset=offset), 'isReload': False})
     # print('get channels emit', current_user.username, offset)
 

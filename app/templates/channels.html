@@ -166,7 +166,10 @@
     {{#each channels}}
     <li class="{{#if_eq name ../activeChannel}}channel-active{{/if_eq}}" data-channel="{{name}}"
         data-pinned="{{pinned}}">
-        <i class="fas fa-thumbtack {{#unless pinned}}channel-unpinned{{/unless}}"></i>
+        <div class="channel-pin-icon icon-button {{#if pinned}}icon-button-pin{{else}}icon-button-unpin{{/if}} d-inline-block"
+             data-tooltip="tooltip" title="{{#if pinned}}Unpin channel{{else}}Pin channel{{/if}}">
+            <i class="fas fa-thumbtack"></i>
+        </div>
         <div class="channel-name d-inline-block">
             {{name}}
         </div>
