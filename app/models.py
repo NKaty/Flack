@@ -49,7 +49,7 @@ class User(UserMixin, db.Model):
         return f'{url}/{avatar_hash}?s={size}&d={default}&r={rating}'
 
     def get_all_channels(self, offset):
-        limit = 10
+        limit = 30
         pinned_channels = self.pinned_channels.order_by(Channel.name.asc()).all()
         pinned_channels_len = len(pinned_channels)
         if pinned_channels_len >= offset + limit:
@@ -86,11 +86,6 @@ class Channel(db.Model):
                             lazy='dynamic')
     messages = db.relationship('Message', backref='channel', lazy='dynamic')
     creator = db.relationship('User', foreign_keys=[creator_id], backref='created_channels')
-
-    # @staticmethod
-    # def get_all_channels(offset):
-    #     channels = Channel.query.order_by(Channel.name.asc()).offset(offset).limit(10).all()
-    #     return [channel.name for channel in channels]
 
     def get_all_channel_messages(self, offset):
         messages = self.messages.order_by(Message.timestamp.desc()).offset(offset).limit(20).all()

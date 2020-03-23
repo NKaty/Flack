@@ -398,6 +398,7 @@ $(function () {
       const actionToPin = !channelItem.data('pinned');
       const channel = channelItem.data('channel');
       this.hideTooltips();
+      if (actionToPin) this.channelsSection.scrollTop(0);
       return { channel: channel, actionToPin: actionToPin };
     }
 

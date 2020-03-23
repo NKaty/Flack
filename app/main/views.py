@@ -30,7 +30,6 @@ def connect():
     if current_user.channel_id is not None:
         emit('set initial info', {'channel': current_user.current_channel.name,
                                   'username': current_user.username})
-        # emit('load channel information', current_user.current_channel.to_json())
 
 
 @socketio.on('disconnect')
@@ -160,7 +159,6 @@ def get_messages(offset, from_scroll_event):
 def get_channels(offset):
     emit('load channels',
          {'channels': current_user.get_all_channels(offset=offset), 'isReload': False})
-    # emit('load channels', {'channels': Channel.get_all_channels(offset=offset), 'isReload': False})
     # print('get channels emit', current_user.username, offset)
 
 
