@@ -104,8 +104,8 @@ $(function () {
       const membersOptions = {
         name: 'members',
         listElem: this.view.members,
-        component: this.view.membersSection,
-        sentinel: this.view.membersSentinel,
+        component: this.view.channelInfoSection,
+        sentinel: this.view.channelInfoSentinel,
         loadCallback: () => this.socket.emit('get members', this.members.loadedNumber),
         renderer: this.view.renderMembers
       };
@@ -135,7 +135,7 @@ $(function () {
     }
 
     onLoadChannelInformation (info) {
-      this.view.renderChannelInformation(info);
+      this.view.renderChannelDetails(info);
     }
 
     initializeChannelChangeEvent () {
@@ -243,18 +243,18 @@ $(function () {
       this.tooltipSelector = '[data-tooltip="tooltip"]';
       this.channels = $('#channels');
       this.messages = $('#messages');
-      this.channelInfo = $('#channel-info');
+      this.channelDetails = $('#channel-details');
       this.members = $('#members');
       this.messagesSection = this.messages.closest('.chat-section');
       this.channelsSection = this.channels.closest('.chat-section');
-      this.membersSection = this.members.closest('.chat-section');
+      this.channelInfoSection = this.channelDetails.closest('.chat-section');
       this.channelNameClass = '.channel-name';
       this.channelPinIconClass = '.channel-pin-icon';
       this.channelNameHeader = $('#channel-name-header');
       this.togglePaneButtons = $('.toggle-pane');
       this.toggleChannelPaneButton = $('.toggle-pane[data-target="#messages-tab"]');
-      this.toggleMembersButton = $('#open-members');
-      this.closeMembersButton = $('#close-members');
+      this.toggleChannelInfoPaneButton = $('#toggle-channel-info');
+      this.closeChannelInfoPaneButton = $('#close-channel-info');
       this.createChannelModal = $('#create-channel-modal');
       this.channelNameInput = this.createChannelModal.find('input[name="channel"]');
       this.channelDescriptionInput = this.createChannelModal.find('textarea[name="description"]');
@@ -269,7 +269,7 @@ $(function () {
       this.sendMessageButton = $('#btn-send');
       this.flashTemplate = $('#flash-template');
       this.channelsTemplate = $('#channels-template');
-      this.channelInfoTemplate = $('#info-template');
+      this.channelDetailsTemplate = $('#channel-details-template');
       this.membersTemplate = $('#members-template');
       this.messagesTemplate = $('#messages-template');
       this.logoutButton = $('#logout');
@@ -280,9 +280,9 @@ $(function () {
       // this.channelsSpinner = $('#channels-spinner');
       // this.membersSpinner = $('#members-spinner');
       this.channelsSentinel = $('#channels-sentinel');
-      this.membersSentinel = $('#members-sentinel');
+      this.channelInfoSentinel = $('#channel-info-sentinel');
       this.messagesSentinel = $('#messages-sentinel');
-      this.maxumumFileSize = 5 * 1024 * 1024;
+      this.maximumFileSize = 5 * 1024 * 1024;
       this.renderChannels = this.renderChannels.bind(this);
       this.renderMembers = this.renderMembers.bind(this);
       this.renderMessages = this.renderMessages.bind(this);
@@ -417,11 +417,11 @@ $(function () {
         let animationClass = 'animated faster ';
         const nextPane = $($(this).data('target'));
         if (nextPane.hasClass('channels')) animationClass += 'slideInLeft';
-        else if (nextPane.hasClass('members')) animationClass += 'slideInRight';
+        else if (nextPane.hasClass('channel-info')) animationClass += 'slideInRight';
         else if (nextPane.hasClass('messages')) {
           const currentPane = $(this).closest('.chat-section');
           if (currentPane.hasClass('channels')) animationClass += 'slideInRight';
-          else if (currentPane.hasClass('members')) animationClass += 'slideInLeft';
+          else if (currentPane.hasClass('channel-info')) animationClass += 'slideInLeft';
         }
 
         function onAnimationEnded () {
@@ -436,39 +436,39 @@ $(function () {
 
     onToggleMembersPane () {
       const self = this;
-      this.toggleMembersButton.on('click', function () {
+      this.toggleChannelInfoPaneButton.on('click', function () {
         self.checkScreenChangedFromExtraSmall();
         if ($(this).hasClass('active')) self.closeMembersPane();
         else {
-          self.membersSection.addClass('removed d-sm-block');
+          self.channelInfoSection.addClass('removed d-sm-block');
           $(this).addClass('active');
-          setTimeout(() => self.membersSection.removeClass('removed'), 50);
+          setTimeout(() => self.channelInfoSection.removeClass('removed'), 50);
         }
       });
     }
 
     onCloseMembersPane () {
-      this.closeMembersButton.on('click', () => {
+      this.closeChannelInfoPaneButton.on('click', () => {
         this.checkScreenChangedFromExtraSmall();
         this.closeMembersPane();
       });
     }
 
     closeMembersPane () {
-      this.membersSection.addClass('removed');
+      this.channelInfoSection.addClass('removed');
       const onAnimationEnded = () => {
-        this.membersSection.removeClass('d-sm-block removed');
-        this.toggleMembersButton.removeClass('active');
-        this.membersSection.off('transitionend', onAnimationEnded);
+        this.channelInfoSection.removeClass('d-sm-block removed');
+        this.toggleChannelInfoPaneButton.removeClass('active');
+        this.channelInfoSection.off('transitionend', onAnimationEnded);
       };
-      this.membersSection.on('transitionend', onAnimationEnded);
+      this.channelInfoSection.on('transitionend', onAnimationEnded);
     }
 
     checkScreenChangedFromExtraSmall () {
-      if (this.membersSection.hasClass('active')) {
-        this.membersSection.removeClass('active').addClass('d-sm-block');
+      if (this.channelInfoSection.hasClass('active')) {
+        this.channelInfoSection.removeClass('active').addClass('d-sm-block');
         this.messagesSection.addClass('active');
-        this.toggleMembersButton.addClass('active');
+        this.toggleChannelInfoPaneButton.addClass('active');
       }
     }
 
@@ -509,9 +509,9 @@ $(function () {
           isValid = false;
           errors.push('File size is unknown or 0.');
         }
-        if (files[0].size > this.maxumumFileSize) {
+        if (files[0].size > this.maximumFileSize) {
           isValid = false;
-          errors.push(`File exceeded maximum size ${this.calculateUploadFileSize(this.maxumumFileSize)}.`);
+          errors.push(`File exceeded maximum size ${this.calculateUploadFileSize(this.maximumFileSize)}.`);
         }
       }
       return { isValid: isValid, error: errors.length ? errors.join(' ') : '' };
@@ -616,10 +616,10 @@ $(function () {
       this.sendMessageForm.removeClass('d-none');
     }
 
-    renderChannelInformation (info) {
-      const template = Handlebars.compile(this.channelInfoTemplate.html());
+    renderChannelDetails (info) {
+      const template = Handlebars.compile(this.channelDetailsTemplate.html());
       const html = template(info);
-      this.channelInfo.html('').append(html);
+      this.channelDetails.html('').append(html);
     }
 
     renderMembers (members) {

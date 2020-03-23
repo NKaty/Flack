@@ -20,7 +20,7 @@
     -ms-overflow-style: -ms-autohiding-scrollbar;
 }
 
-.channels, .members {
+.channels, .channel-info {
     flex: 1;
     min-width: 240px;
     transition: all 0.3s linear;
@@ -38,7 +38,7 @@
 
 .channels::-webkit-scrollbar,
 .messages::-webkit-scrollbar,
-.members::-webkit-scrollbar {
+.channel-info::-webkit-scrollbar {
     display: none;
 }
 
@@ -96,7 +96,7 @@
     color: #6f42c1;
 }
 
-.channel-info:not(:empty) {
+.channel-details:not(:empty) {
     border-bottom: 1px solid #c7c8c9;
 }
 
@@ -333,7 +333,7 @@ textarea:not([type="hidden"]) ~ .invalid-feedback {
         background: linear-gradient(to right, #8c6dea, #cf56f5);
     }
 
-    .members .fixed-header {
+    .channel-info .fixed-header {
         background: -webkit-linear-gradient(to right, #ce57f6, #e95ef9);
         background: -o-linear-gradient(to right, #ce57f6, #e95ef9);
         background: -moz-linear-gradient(to right, #ce57f6, #e95ef9);

@@ -47,11 +47,11 @@
             <h4 id="channel-name-header" class="text-truncate">{{ user.current_channel.name if user.channel_id else
                 'Chat'}}</h4>
             <div class="d-block d-sm-none toggle-pane icon-button-arrow icon-button-absolute icon-button-right"
-                 data-toggle="tab" data-target="#members-tab">
+                 data-toggle="tab" data-target="#channel-info-tab">
                 <i class="fas fa-arrow-right"></i>
             </div>
             <div class="d-none d-sm-block d-lg-none icon-button icon-button-absolute icon-button-right"
-                 id="open-members" data-tooltip="tooltip" title="Toggle info panel">
+                 id="toggle-channel-info" data-tooltip="tooltip" title="Toggle info panel">
                 <i class="fas fa-info-circle"></i>
             </div>
         </div>
@@ -89,7 +89,7 @@
             </form>
         </div>
     </div>
-    <div class="chat-section members tab-pane d-lg-block shadow-sm" id="members-tab">
+    <div class="chat-section channel-info tab-pane d-lg-block shadow-sm" id="channel-info-tab">
         <div class="fixed-header justify-content-center shadow">
             <div class="d-block d-sm-none toggle-pane icon-button-arrow icon-button-absolute icon-button-left"
                  data-toggle="tab" data-target="#messages-tab">
@@ -97,18 +97,18 @@
             </div>
             <h4>Channel info</h4>
             <div class="d-none d-sm-block d-lg-none icon-button icon-button-absolute icon-button-right"
-                 id="close-members" data-tooltip="tooltip" title="Close info panel">
+                 id="close-channel-info" data-tooltip="tooltip" title="Close info panel">
                 <i class="fas fa-times-circle"></i>
             </div>
         </div>
         <div class="text-center">
             <div class="d-inline-block text-left">
-                <div id="channel-info" class="mx-3 mb-3 channel-info"></div>
+                <div id="channel-details" class="mx-3 mb-3 channel-details"></div>
                 <h5 class="px-3 mb-3">Active members</h5>
                 <ul id="members" class="list-unstyled px-3"></ul>
             </div>
         </div>
-        <div id="members-sentinel" class="sentinel d-flex justify-content-center mt-2">
+        <div id="channel-info-sentinel" class="sentinel d-flex justify-content-center mt-2">
             <!--            <div class="spinner-border text-secondary" id="members-spinner" role="status">-->
             <!--                <span class="sr-only">Loading...</span>-->
             <!--            </div>-->
@@ -178,7 +178,7 @@
     {{/each}}
 </script>
 
-<script id="info-template" type="text/x-handlebars-template">
+<script id="channel-details-template" type="text/x-handlebars-template">
     <h5 class="mb-3">Channel details</h5>
     <h6 class="lead mb-0">Name</h6>
     <p class="mb-3">{{name}}</p>
