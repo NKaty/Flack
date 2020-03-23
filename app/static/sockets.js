@@ -295,8 +295,8 @@ $(function () {
       this.initializeTooltips(this.tooltipSelector);
       this.setChatContainerHeight();
       this.togglePane();
-      this.onToggleMembersPane();
-      this.onCloseMembersPane();
+      this.onToggleChannelInfoPane();
+      this.onCloseChannelInfoPane();
       this.onWindowResize();
       this.toggleUploadFileName();
       this.unlinkUploadFile();
@@ -434,11 +434,11 @@ $(function () {
       });
     }
 
-    onToggleMembersPane () {
+    onToggleChannelInfoPane () {
       const self = this;
       this.toggleChannelInfoPaneButton.on('click', function () {
         self.checkScreenChangedFromExtraSmall();
-        if ($(this).hasClass('active')) self.closeMembersPane();
+        if ($(this).hasClass('active')) self.closeChannelInfoPane();
         else {
           self.channelInfoSection.addClass('removed d-sm-block');
           $(this).addClass('active');
@@ -447,14 +447,14 @@ $(function () {
       });
     }
 
-    onCloseMembersPane () {
+    onCloseChannelInfoPane () {
       this.closeChannelInfoPaneButton.on('click', () => {
         this.checkScreenChangedFromExtraSmall();
-        this.closeMembersPane();
+        this.closeChannelInfoPane();
       });
     }
 
-    closeMembersPane () {
+    closeChannelInfoPane () {
       this.channelInfoSection.addClass('removed');
       const onAnimationEnded = () => {
         this.channelInfoSection.removeClass('d-sm-block removed');
