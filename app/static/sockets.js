@@ -346,7 +346,6 @@ $(function () {
     onWindowResize () {
       const optimizedResize = this.throttle(() => {
         this.setChatContainerHeight();
-        this.scrollToChatBottom();
       }, 150);
       $(window).on('resize', optimizedResize);
     }
