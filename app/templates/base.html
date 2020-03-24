@@ -18,7 +18,7 @@
 
     <main class="flex-grow-1 main-container pt-3"
           style="background-image: url('{{ url_for('static', filename='images/bg-img.jpg') }}')">
-        <div id="flash-messages">
+        <div id="flash-messages" class="mx-3 flash-messages">
             {% for message in get_flashed_messages(True) %}
             <div class="alert alert-{{ message[0] }} alert-dismissible fade show" role="alert">
                 {{ message[1] }}
