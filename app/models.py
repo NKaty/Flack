@@ -1,6 +1,7 @@
 from datetime import datetime
 import hashlib
 
+from flask import current_app
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -49,7 +50,7 @@ class User(UserMixin, db.Model):
         return f'{url}/{avatar_hash}?s={size}&d={default}&r={rating}'
 
     def get_all_channels(self, offset):
-        limit = 30
+        limit = current_app.config['CHANNELS_LIMIT']
         pinned_channels = self.pinned_channels.order_by(Channel.name.asc()).all()
         pinned_channels_len = len(pinned_channels)
         if pinned_channels_len >= offset + limit:
@@ -88,12 +89,13 @@ class Channel(db.Model):
     creator = db.relationship('User', foreign_keys=[creator_id], backref='created_channels')
 
     def get_all_channel_messages(self, offset):
-        messages = self.messages.order_by(Message.timestamp.desc()).offset(offset).limit(20).all()
+        messages = self.messages.order_by(Message.timestamp.desc()).offset(offset).limit(
+            current_app.config['MESSAGES_LIMIT']).all()
         return [message.to_json() for message in messages[::-1]]
 
     def get_all_channel_members(self, offset):
         members = self.users.filter_by(is_connected=True).order_by(User.username.asc()).offset(
-            offset).limit(1).all()
+            offset).limit(current_app.config['MEMBERS_LIMIT']).all()
         return [member.username for member in members]
 
     def to_json(self):

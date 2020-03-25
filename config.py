@@ -10,6 +10,9 @@ class Config:
     SESSION_TYPE = 'filesystem'
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024
     DEFAULT_CHANNEL = 'general'
+    CHANNELS_LIMIT = 30
+    MESSAGES_LIMIT = 50
+    MEMBERS_LIMIT = 30
 
 
 class DevelopmentConfig(Config):
