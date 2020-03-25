@@ -8,11 +8,11 @@ from sqlalchemy import MetaData
 from config import config
 
 naming_convention = {
-    "ix": 'ix_%(column_0_label)s',
-    "uq": "uq_%(table_name)s_%(column_0_name)s",
-    "ck": "ck_%(table_name)s_%(column_0_name)s",
-    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
-    "pk": "pk_%(table_name)s"
+    'ix': 'ix_%(column_0_label)s',
+    'uq': 'uq_%(table_name)s_%(column_0_name)s',
+    'ck': 'ck_%(table_name)s_%(column_0_name)s',
+    'fk': 'fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s',
+    'pk': 'pk_%(table_name)s'
 }
 
 db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
@@ -21,7 +21,7 @@ session = Session()
 
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
-login_manager.login_message_category = "danger"
+login_manager.login_message_category = 'danger'
 
 
 def create_app(config_name):
