@@ -9,6 +9,7 @@ class Config:
     SESSION_PERMANENT = False
     SESSION_TYPE = 'filesystem'
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024
+    DEFAULT_CHANNEL = 'general'
 
 
 class DevelopmentConfig(Config):

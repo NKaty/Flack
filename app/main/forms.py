@@ -38,16 +38,16 @@ class MessageForm(CustomForm):
             if not field.data:
                 raise ValidationError('File size is unknown. Upload rejected by server.')
             if field.data > current_app.config['MAX_CONTENT_LENGTH']:
-                size = round(current_app.config["MAX_CONTENT_LENGTH"] / pow(1024, 2), 1)
+                size = round(current_app.config['MAX_CONTENT_LENGTH'] / pow(1024, 2), 1)
                 raise ValidationError(
                     f'File exceeded maximum size {size}MB. Upload rejected by server.')
 
     def validate_content(self, field):
         if self.file.data:
             if not field.data:
-                raise ValidationError("File has no content. Upload rejected by server.")
+                raise ValidationError('File has no content. Upload rejected by server.')
             if not isinstance(field.data, bytes):
-                raise ValidationError("Upload rejected by server.")
+                raise ValidationError('Upload rejected by server.')
 
 
 class CreateChannelForm(CustomForm):

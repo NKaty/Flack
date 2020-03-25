@@ -44,8 +44,7 @@
                  data-toggle="tab" data-target="#channels-tab">
                 <i class="fas fa-arrow-left"></i>
             </div>
-            <h4 id="channel-name-header" class="text-truncate">{{ user.current_channel.name if user.channel_id else
-                'Chat'}}</h4>
+            <h4 id="channel-name-header" class="text-truncate">{{ user.current_channel.name }}</h4>
             <div class="d-block d-sm-none toggle-pane icon-button-arrow icon-button-absolute icon-button-right"
                  data-toggle="tab" data-target="#channel-info-tab">
                 <i class="fas fa-arrow-right"></i>
@@ -61,11 +60,7 @@
             </div>
         </div>
         <div id="messages-area">
-            <div id="messages" class="d-flex flex-column mx-3">
-                {% if not user.channel_id %}
-                <p>Select channel or create your own channel to start messaging</p>
-                {% endif %}
-            </div>
+            <div id="messages" class="d-flex flex-column mx-3"></div>
             <form class="mx-3 my-3 {{ 'd-none' if not user.channel_id }}" id="send-message">
                 <div class="d-flex align-items-end">
                     <div class="form-group icon-button icon-button-send-message-form upload-field">

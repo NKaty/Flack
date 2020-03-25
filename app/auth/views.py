@@ -1,9 +1,9 @@
-from flask import render_template, redirect, request, url_for, flash
+from flask import current_app, render_template, redirect, request, url_for, flash
 from flask_login import login_user, logout_user, login_required
 
 from . import auth
 from .. import db
-from ..models import User
+from ..models import User, Channel
 from .forms import LoginForm, SignupForm
 from .login_helper import is_safe_url
 
@@ -14,7 +14,9 @@ def signup():
     if form.validate_on_submit():
         user = User(username=form.username.data,
                     email=form.email.data.lower(),
-                    password=form.password.data)
+                    password=form.password.data,
+                    channel_id=Channel.query.filter_by(
+                        name=current_app.config['DEFAULT_CHANNEL']).first().id)
         db.session.add(user)
         db.session.commit()
         flash('Congratulations, you are now a registered user!', 'success')
