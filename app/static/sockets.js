@@ -303,6 +303,7 @@ $(function () {
       this.validateSendMessageForm();
       this.resizeMessageInput();
       this.animatePaneChanging();
+      this.initializePresentFlashMessages();
     }
 
     handlebarsHelpers () {
@@ -647,6 +648,13 @@ $(function () {
     closeFlashMessages (messagesLen) {
       const alerts = this.flashMessages.find('.alert').slice(-messagesLen);
       alerts.each((index, item) => setTimeout(() => $(item).alert('close'), 10000));
+    }
+
+    initializePresentFlashMessages () {
+      if (this.flashMessages.children().length > 0) {
+        this.onFlashMessageClosed();
+        this.closeFlashMessages(this.flashMessages.children().length);
+      }
     }
 
     throttle (func, wait = 250, immediate = false) {
