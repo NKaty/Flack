@@ -60,6 +60,10 @@
     background: linear-gradient(to right, #7b79e8, #e95ef9);
 }
 
+.channel-name-header {
+    max-width: calc(100% - 2.6em);
+}
+
 .channel-items-list {
     margin-left: auto;
     margin-right: auto;
