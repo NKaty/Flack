@@ -15,8 +15,8 @@ def signup():
         user = User(username=form.username.data,
                     email=form.email.data.lower(),
                     password=form.password.data,
-                    channel_id=Channel.query.filter_by(
-                        name=current_app.config['DEFAULT_CHANNEL']).first().id)
+                    current_channel=Channel.query.filter_by(
+                        name=current_app.config['DEFAULT_CHANNEL']).first())
         db.session.add(user)
         db.session.commit()
         flash('Congratulations, you are now a registered user!', 'success')
