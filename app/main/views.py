@@ -88,7 +88,6 @@ def send_message(data):
                                             content=file['content'],
                                             size=file['size'],
                                             type=file['type'] if len(file['type']) else None)
-                db.session.add(message_dict['file'])
             message = Message(**message_dict)
             db.session.add(message)
             db.session.commit()

@@ -5,7 +5,7 @@ from faker import Faker
 from sqlalchemy.exc import IntegrityError, DataError
 
 from . import db
-from .models import User, Channel, Message
+from .models import User, Channel, Message, File
 
 
 def create_default_channel():
@@ -14,7 +14,6 @@ def create_default_channel():
                  username='admin',
                  password='65432123456',
                  is_connected=False)
-    db.session.add(admin)
     channel = Channel(name=current_app.config['DEFAULT_CHANNEL'],
                       description='Default channel',
                       timestamp=fake.date_time_between(start_date='-80d', end_date='-70d'),
@@ -41,7 +40,7 @@ def create_users(count=10):
         try:
             db.session.commit()
             i += 1
-        except IntegrityError:
+        except (IntegrityError, DataError):
             db.session.rollback()
 
 
@@ -63,7 +62,8 @@ def create_channels(count=10):
             db.session.rollback()
 
 
-def create_messages(messages_per_channel_max_count=10, users_per_channel_max_count=10):
+def create_messages(messages_per_channel_max_count=2, users_per_channel_max_count=2,
+                    file_size=5926):
     fake = Faker()
     channels = Channel.query.all()
     users_len = User.query.count()
@@ -74,11 +74,17 @@ def create_messages(messages_per_channel_max_count=10, users_per_channel_max_cou
             user_offsets = sample(list(range(0, users_len - 1)), users_count)
             users = [User.query.offset(offset).first() for offset in user_offsets]
             for i in range(count_messages):
+                with_file = randint(1, 10) > 8
+                file = None if not with_file else File(name=fake.file_name(extension='txt'),
+                                                       type='text/plain',
+                                                       size=file_size,
+                                                       content=fake.binary(length=file_size))
                 message = Message(text=fake.text(),
                                   timestamp=fake.date_time_between(start_date='-60d',
                                                                    end_date='now'),
                                   author=choice(users),
-                                  channel=channel)
+                                  channel=channel,
+                                  file=file)
                 db.session.add(message)
     db.session.commit()
 
