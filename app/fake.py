@@ -81,3 +81,16 @@ def create_messages(messages_per_channel_max_count=10, users_per_channel_max_cou
                                   channel=channel)
                 db.session.add(message)
     db.session.commit()
+
+
+def pin_channels(max_count=10):
+    users = User.query.all()
+    channels_len = Channel.query.count()
+    for user in users:
+        count = randint(0, max_count)
+        if count > 0:
+            channel_offsets = sample(list(range(0, channels_len - 1)), count)
+            channels = [Channel.query.offset(offset).first() for offset in channel_offsets]
+            user.pinned_channels.extend(channels)
+            db.session.add(user)
+    db.session.commit()
