@@ -126,7 +126,7 @@ class Message(db.Model):
             'file': {'id': self.file_id, 'name': self.file.name,
                      'size': self.file.convert_file_size()} if self.file_id else None,
             'author': self.author.username,
-            'avatar': self.author.avatar_hash or self.author.gravatar(),
+            'avatar': self.author.gravatar(),
             'timestamp': self.timestamp.strftime('%Y-%m-%d %H:%M:%S')
         }
 
