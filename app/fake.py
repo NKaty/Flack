@@ -8,11 +8,11 @@ from . import db
 from .models import User, Channel, Message, File
 
 
-def create_default_channel():
+def create_default_channel(password='65432123456'):
     fake = Faker()
     admin = User(email='admin@test.com',
                  username='admin',
-                 password='65432123456',
+                 password=password,
                  is_connected=False)
     channel = Channel(name=current_app.config['DEFAULT_CHANNEL'],
                       description='Default channel',
@@ -25,7 +25,7 @@ def create_default_channel():
     db.session.commit()
 
 
-def create_users(count=10):
+def create_users(count=100, password='65432123456'):
     fake = Faker()
     i = 0
     current_channel = Channel.query.filter_by(
@@ -33,7 +33,7 @@ def create_users(count=10):
     while i < count:
         user = User(email=fake.email(),
                     username=fake.user_name(),
-                    password='65432123456',
+                    password=password,
                     is_connected=False,
                     current_channel=current_channel)
         db.session.add(user)
@@ -62,7 +62,7 @@ def create_channels(count=10):
             db.session.rollback()
 
 
-def create_messages(messages_per_channel_max_count=2, users_per_channel_max_count=2,
+def create_messages(messages_per_channel_max_count=100, users_per_channel_max_count=10,
                     file_size=5926):
     fake = Faker()
     channels = Channel.query.all()
@@ -100,3 +100,11 @@ def pin_channels(max_count=10):
             user.pinned_channels.extend(channels)
             db.session.add(user)
     db.session.commit()
+
+
+def fake_data():
+    create_default_channel()
+    create_users()
+    create_channels()
+    create_messages()
+    pin_channels()
