@@ -322,6 +322,13 @@ textarea:not([type="hidden"]) ~ .invalid-feedback {
     transition: all 0.4s linear;
 }
 
+.error-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+}
+
 @media (min-width: 576px) {
     .channels .fixed-header {
         background: -webkit-linear-gradient(to right, #58a2e1, #8c6dea);
