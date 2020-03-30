@@ -168,7 +168,6 @@
         <div class="channel-name d-inline-block">
             {{name}}
         </div>
-
     </li>
     {{/each}}
 </script>
@@ -184,8 +183,8 @@
 </script>
 
 <script id="members-template" type="text/x-handlebars-template">
-    {{#each .}}
-    <li>{{this}}</li>
+    {{#each members}}
+    <li class="{{#if_eq this ../username}}current-user{{/if_eq}}">{{this}}</li>
     {{/each}}
 </script>
 

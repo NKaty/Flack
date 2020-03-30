@@ -72,7 +72,8 @@ $(function () {
                                                                    this.username));
       this.socket.on('load channels', data => this.channels.onLoad(data.channels, data.isReload,
                                                                    this.activeChannel));
-      this.socket.on('load members', data => this.members.onLoad(data.members, data.isReload));
+      this.socket.on('load members', data => this.members.onLoad(data.members, data.isReload,
+                                                                 this.username));
       this.socket.on('load channel information', info => this.onLoadChannelInformation(info));
       this.socket.on('flash', messages => this.view.showFlashMessages(messages));
     }
@@ -622,9 +623,9 @@ $(function () {
       this.channelDetails.html('').append(html);
     }
 
-    renderMembers (members) {
+    renderMembers (members, username) {
       const template = Handlebars.compile(this.membersTemplate.html());
-      const html = template(members);
+      const html = template({ members: members, username: username });
       this.members.append(html);
     }
 

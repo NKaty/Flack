@@ -104,6 +104,10 @@
     border-bottom: 1px solid #c7c8c9;
 }
 
+.current-user {
+    color: #fff;
+}
+
 textarea[name="message"] {
     resize: none;
 }
