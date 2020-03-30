@@ -44,7 +44,7 @@ def create_users(count=100, password='65432123456'):
             db.session.rollback()
 
 
-def create_channels(count=10):
+def create_channels(count=100):
     fake = Faker()
     i = 0
     users_count = User.query.count()
@@ -63,7 +63,7 @@ def create_channels(count=10):
 
 
 def create_messages(messages_per_channel_max_count=100, users_per_channel_max_count=10,
-                    file_size=5926):
+                    max_file_size=65536):
     fake = Faker()
     channels = Channel.query.all()
     users_len = User.query.count()
@@ -71,10 +71,12 @@ def create_messages(messages_per_channel_max_count=100, users_per_channel_max_co
         count_messages = randint(0, messages_per_channel_max_count)
         if count_messages > 0:
             users_count = randint(2, users_per_channel_max_count)
-            user_offsets = sample(list(range(0, users_len - 1)), users_count)
+            user_offsets = sample(list(range(0, users_len)), users_count)
             users = [User.query.offset(offset).first() for offset in user_offsets]
             for i in range(count_messages):
                 with_file = randint(1, 10) > 8
+                if with_file:
+                    file_size = randint(1, max_file_size)
                 file = None if not with_file else File(name=fake.file_name(extension='txt'),
                                                        type='text/plain',
                                                        size=file_size,
@@ -95,7 +97,7 @@ def pin_channels(max_count=10):
     for user in users:
         count = randint(0, max_count)
         if count > 0:
-            channel_offsets = sample(list(range(0, channels_len - 1)), count)
+            channel_offsets = sample(list(range(0, channels_len)), count)
             channels = [Channel.query.offset(offset).first() for offset in channel_offsets]
             user.pinned_channels.extend(channels)
             db.session.add(user)
