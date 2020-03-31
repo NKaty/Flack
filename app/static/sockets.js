@@ -37,7 +37,7 @@ $(function () {
       }
       this.renderer(list, ...args);
       this.isContainerFull = this.component[0].scrollHeight > this.component[0].clientHeight ||
-      this.component.outerHeight(true) > this.wrapperComponent.height();
+        this.component.outerHeight(true) > this.wrapperComponent.height();
       if (!this.isContainerFull && cb) cb();
     }
 
@@ -342,11 +342,17 @@ $(function () {
       this.chatContainer.outerHeight(height);
     }
 
-    scrollToChatBottom () {
+    scrollToChatBottom (animation = true) {
       if ((this.messagesSection[0].scrollHeight - this.messagesSection[0].scrollTop -
         this.messagesSection[0].clientHeight) !== 0) {
-        this.messagesSection.scrollTop(this.messagesSection[0].scrollHeight);
+        if (animation) this.messagesSection.animate({ scrollTop: this.messagesSection[0].scrollHeight }, 'slow');
+        else this.messagesSection.scrollTop(this.messagesSection[0].scrollHeight);
       }
+    }
+
+    checkBottomScroll() {
+      return (this.messagesSection[0].scrollHeight -
+          this.messagesSection[0].scrollTop - this.messagesSection[0].clientHeight) !== 0
     }
 
     onWindowResize () {
@@ -588,7 +594,7 @@ $(function () {
       const offset = this.messageInput[0].offsetHeight - this.messageInput[0].clientHeight;
       this.messageInput.on('input', function () {
         $(this).outerHeight('auto').outerHeight(this.scrollHeight + offset);
-        self.scrollToChatBottom();
+        self.scrollToChatBottom(false);
       });
     }
 
@@ -596,8 +602,11 @@ $(function () {
       const template = Handlebars.compile(this.messagesTemplate.html());
       const html = template({ messages: messages, username: username });
       if (fromSendMessage) {
+        const isBottomScroll = this.checkBottomScroll();
+        const prevScrollTop = this.messagesSection.scrollTop();
         this.messages.append(html);
-        this.scrollToChatBottom();
+        if (isBottomScroll) this.messagesSection.scrollTop(prevScrollTop);
+        else this.scrollToChatBottom();
       } else if (fromScrollEvent) {
         const prevScrollTop = this.messagesSection.scrollTop();
         // variant without spinner
@@ -616,7 +625,7 @@ $(function () {
         }, 300);
       } else {
         this.messages.prepend(html);
-        this.scrollToChatBottom();
+        this.scrollToChatBottom(false);
       }
       this.sendMessageForm.removeClass('d-none');
     }
@@ -643,9 +652,10 @@ $(function () {
     showFlashMessages (messages) {
       const template = Handlebars.compile(this.flashTemplate.html());
       const html = template(messages);
+      const isBottomScroll = this.checkBottomScroll();
       this.flashMessages.append(html);
       this.setChatContainerHeight();
-      this.scrollToChatBottom();
+      if (!isBottomScroll) this.scrollToChatBottom(false);
       this.onFlashMessageClosed();
       this.closeFlashMessages(messages.length);
     }
