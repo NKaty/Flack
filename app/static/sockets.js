@@ -4,6 +4,7 @@ $(function () {
       this.name = options.name;
       this.listElem = options.listElem;
       this.component = options.component;
+      this.wrapperComponent = options.wrapperComponent || $(document.body);
       this.loadCallback = options.loadCallback;
       this.scrollCallback = options.scrollCallback || options.loadCallback;
       this.sentinel = options.sentinel;
@@ -35,8 +36,8 @@ $(function () {
         return;
       }
       this.renderer(list, ...args);
-      // console.log(this.name, this.component[0].scrollHeight, this.component[0].clientHeight);
-      this.isContainerFull = this.component[0].scrollHeight > this.component[0].clientHeight;
+      this.isContainerFull = this.component[0].scrollHeight > this.component[0].clientHeight ||
+      this.component.outerHeight(true) > this.wrapperComponent.height();
       if (!this.isContainerFull && cb) cb();
     }
 
@@ -97,6 +98,7 @@ $(function () {
         name: 'channels',
         listElem: this.view.channels,
         component: this.view.channelsSection,
+        wrapperComponent: this.view.chatContainer,
         sentinel: this.view.channelsSentinel,
         loadCallback: () => this.socket.emit('get channels', this.channels.loadedNumber),
         renderer: this.view.renderChannels
@@ -106,6 +108,7 @@ $(function () {
         name: 'members',
         listElem: this.view.members,
         component: this.view.channelInfoSection,
+        wrapperComponent: this.view.chatContainer,
         sentinel: this.view.channelInfoSentinel,
         loadCallback: () => this.socket.emit('get members', this.members.loadedNumber),
         renderer: this.view.renderMembers
@@ -115,6 +118,7 @@ $(function () {
         name: 'messages',
         listElem: this.view.messages,
         component: this.view.messagesSection,
+        wrapperComponent: this.view.chatContainer,
         sentinel: this.view.messagesSentinel,
         spinner: this.view.messagesSpinner,
         loadCallback: () => this.socket.emit('get messages', this.messages.loadedNumber, false),
