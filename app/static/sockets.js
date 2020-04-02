@@ -87,7 +87,7 @@ $(function () {
         this.initializeMessageSendEvent();
         this.initializeDownloadFileEvent();
         this.initializeChannelCreateEvent();
-        this.initializeChannelCreateOpenEvent();
+        this.initializeChannelCreateFormOpenEvent();
         this.initializeChannelCreateFormCloseEvent();
         this.initializeLogoutEvent();
       }
@@ -225,7 +225,7 @@ $(function () {
       });
     }
 
-    initializeChannelCreateOpenEvent () {
+    initializeChannelCreateFormOpenEvent () {
       this.view.channelCreateFormOpen();
     }
 
@@ -280,10 +280,7 @@ $(function () {
       this.logoutButton = $('#logout');
       this.navbar = $('#navbar');
       this.chatContainer = $('#chat-container');
-      // this.spinners = $('.spinner-border');
       this.messagesSpinner = $('#messages-spinner');
-      // this.channelsSpinner = $('#channels-spinner');
-      // this.membersSpinner = $('#members-spinner');
       this.channelsSentinel = $('#channels-sentinel');
       this.channelInfoSentinel = $('#channel-info-sentinel');
       this.messagesSentinel = $('#messages-sentinel');
@@ -609,12 +606,6 @@ $(function () {
         else this.scrollToChatBottom();
       } else if (fromScrollEvent) {
         const prevScrollTop = this.messagesSection.scrollTop();
-        // variant without spinner
-        // const wrappedHtml = $(`<div id="wrapper">${html}</div>`);
-        // this.messages.prepend(wrappedHtml);
-        // this.sectionMessages.scrollTop(prevScrollTop + wrappedHtml.outerHeight());
-        // wrappedHtml.children().unwrap();
-        // variant with spinner
         const wrappedHtml = $(`<div id="wrapper" class="invisible">${html}</div>`);
         this.messages.append(wrappedHtml);
         const htmlHeight = wrappedHtml.outerHeight();
