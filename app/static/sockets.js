@@ -591,6 +591,7 @@ $(function () {
     resetSendMessageForm () {
       this.sendMessageForm[0].reset();
       this.fileInfoField.html('');
+      this.messageInput.attr('rows', 2).outerHeight('auto');
       this.sendMessageButton.prop('disabled', true);
     }
 
