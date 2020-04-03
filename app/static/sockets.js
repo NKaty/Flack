@@ -250,6 +250,7 @@ $(function () {
       this.messages = $('#messages');
       this.channelDetails = $('#channel-details');
       this.members = $('#members');
+      this.messagesArea = $('#messages-area');
       this.messagesSection = this.messages.closest('.chat-section');
       this.channelsSection = this.channels.closest('.chat-section');
       this.channelInfoSection = this.channelDetails.closest('.chat-section');
@@ -288,7 +289,7 @@ $(function () {
       this.renderChannels = this.renderChannels.bind(this);
       this.renderMembers = this.renderMembers.bind(this);
       this.renderMessages = this.renderMessages.bind(this);
-      this.scrollToChatBottom = this.scrollToChatBottom.bind(this);
+      // this.scrollToChatBottom = this.scrollToChatBottom.bind(this);
       this.initialize();
     }
 
@@ -339,6 +340,12 @@ $(function () {
       this.chatContainer.outerHeight(height);
     }
 
+    setMessagesAreaHeight () {
+      this.messagesArea.css('minHeight', `${this.messagesSection.height() -
+      this.messagesSection.find('.fixed-header').outerHeight(true) -
+      this.messagesSentinel.outerHeight(true)}px`);
+    }
+
     scrollToChatBottom (animation = true) {
       if ((this.messagesSection[0].scrollHeight - this.messagesSection[0].scrollTop -
         this.messagesSection[0].clientHeight) !== 0) {
@@ -347,14 +354,15 @@ $(function () {
       }
     }
 
-    checkBottomScroll() {
+    checkBottomScroll () {
       return (this.messagesSection[0].scrollHeight -
-          this.messagesSection[0].scrollTop - this.messagesSection[0].clientHeight) !== 0
+        this.messagesSection[0].scrollTop - this.messagesSection[0].clientHeight) !== 0;
     }
 
     onWindowResize () {
       const optimizedResize = this.throttle(() => {
         this.setChatContainerHeight();
+        this.setMessagesAreaHeight();
       }, 150);
       $(window).on('resize', optimizedResize);
     }
@@ -616,9 +624,9 @@ $(function () {
         }, 300);
       } else {
         this.messages.prepend(html);
+        this.setMessagesAreaHeight();
         this.scrollToChatBottom(false);
       }
-      this.sendMessageForm.removeClass('d-none');
     }
 
     renderChannelDetails (info) {
