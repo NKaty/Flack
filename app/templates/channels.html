@@ -185,9 +185,9 @@
     <div class="message media bg-light my-1 {{#if_eq author ../username}}ml-auto{{else}}mr-auto{{/if_eq}}">
         <img class="avatar mr-3" src="{{avatar}}" alt="avatar">
         <div class="media-body">
-            <div class="d-flex justify-content-between">
+            <div class="d-flex justify-content-between flex-wrap">
                 <h6 class="lead mr-3 message-username">{{author}}</h6>
-                <small class="text-secondary text-nowrap">{{date timestamp 'format' 'DD/MM/YY HH:mm'}}</small>
+                <small class="text-secondary text-nowrap mb-2">{{date timestamp 'format' 'DD/MM/YY HH:mm'}}</small>
             </div>
             <div>{{breaklines text}}</div>
             {{#if file}}
