@@ -289,7 +289,7 @@ $(function () {
       this.renderChannels = this.renderChannels.bind(this);
       this.renderMembers = this.renderMembers.bind(this);
       this.renderMessages = this.renderMessages.bind(this);
-      // this.scrollToChatBottom = this.scrollToChatBottom.bind(this);
+      this.scrollToChatBottom = this.scrollToChatBottom.bind(this);
       this.initialize();
     }
 
@@ -301,7 +301,7 @@ $(function () {
       this.onToggleChannelInfoPane();
       this.onCloseChannelInfoPane();
       this.onWindowResize();
-      this.toggleUploadFileName();
+      this.onChangeUploadFileName();
       this.unlinkUploadFile();
       this.validateSendMessageForm();
       this.resizeMessageInput();
@@ -349,7 +349,7 @@ $(function () {
     scrollToChatBottom (animation = true) {
       if ((this.messagesSection[0].scrollHeight - this.messagesSection[0].scrollTop -
         this.messagesSection[0].clientHeight) !== 0) {
-        if (animation) this.messagesSection.animate({ scrollTop: this.messagesSection[0].scrollHeight }, 'slow');
+        if (animation) this.messagesSection.animate({ scrollTop: this.messagesSection[0].scrollHeight }, 2000);
         else this.messagesSection.scrollTop(this.messagesSection[0].scrollHeight);
       }
     }
@@ -561,14 +561,26 @@ $(function () {
       });
     }
 
-    toggleUploadFileName () {
+    toggleUploadFileName (html) {
+      if (html === '') {
+          const parent = this.fileInfoField.parent();
+          parent.animate({ height: 0, opacity: 0 }, () => {
+            this.fileInfoField.html(html);
+            parent.height('auto').css('opacity', 1);
+          });
+        } else {
+          this.fileInfoField.html(html);
+        }
+        this.scrollToChatBottom();
+    }
+
+    onChangeUploadFileName () {
       const self = this;
       this.fileInput.on('change', function () {
         const files = $(this).prop('files');
-        let html = '';
-        if (files.length > 0) html = `${files[0].name} - ${self.calculateUploadFileSize(files[0].size)}`;
-        self.fileInfoField.html(html);
-        self.scrollToChatBottom();
+        const html = files.length > 0 ?
+          `${files[0].name} - ${self.calculateUploadFileSize(files[0].size)}` : '';
+        self.toggleUploadFileName(html);
       });
     }
 
@@ -590,7 +602,7 @@ $(function () {
 
     resetSendMessageForm () {
       this.sendMessageForm[0].reset();
-      this.fileInfoField.html('');
+      this.toggleUploadFileName('');
       this.messageInput.attr('rows', 2).outerHeight('auto');
       this.sendMessageButton.prop('disabled', true);
     }
@@ -606,13 +618,13 @@ $(function () {
 
     renderMessages (messages, fromSendMessage, fromScrollEvent, username) {
       const template = Handlebars.compile(this.messagesTemplate.html());
-      const html = template({ messages: messages, username: username });
+      const html = template({ messages: messages, username: username, animated: fromSendMessage });
       if (fromSendMessage) {
         const isBottomScroll = this.checkBottomScroll();
         const prevScrollTop = this.messagesSection.scrollTop();
         this.messages.append(html);
         if (isBottomScroll) this.messagesSection.scrollTop(prevScrollTop);
-        else this.scrollToChatBottom();
+        else this.scrollToChatBottom(false);
       } else if (fromScrollEvent) {
         const prevScrollTop = this.messagesSection.scrollTop();
         const wrappedHtml = $(`<div id="wrapper" class="invisible">${html}</div>`);

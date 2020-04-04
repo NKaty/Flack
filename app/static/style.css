@@ -358,6 +358,11 @@ textarea:not([type="hidden"]) ~ .invalid-feedback {
     }
 }
 
-.messages-area {
-    /*min-height: calc(100% - 4.5em);*/
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0.7;
+    }
 }

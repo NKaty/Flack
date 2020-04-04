@@ -153,7 +153,7 @@
     {{#each channels}}
     <li class="{{#if_eq name ../activeChannel}}channel-active{{/if_eq}}" data-channel="{{name}}"
         data-pinned="{{pinned}}">
-        <div class="channel-pin-icon icon-button {{#if pinned}}icon-button-pin{{else}}icon-button-unpin{{/if}} d-inline-block"
+        <div class="channel-pin-icon icon-button d-inline-block {{#if pinned}}icon-button-pin{{else}}icon-button-unpin{{/if}}"
              data-tooltip="tooltip" title="{{#if pinned}}Unpin channel{{else}}Pin channel{{/if}}">
             <i class="fas fa-thumbtack"></i>
         </div>
@@ -182,7 +182,8 @@
 
 <script id="messages-template" type="text/x-handlebars-template">
     {{#each messages}}
-    <div class="message media bg-light my-1 {{#if_eq author ../username}}ml-auto{{else}}mr-auto{{/if_eq}}">
+    <div class="message media bg-light my-1 {{#if_eq author ../username}}ml-auto{{else}}mr-auto{{/if_eq}}
+    {{#if ../animated}}animated faster fadeIn{{/if}}">
         <img class="avatar mr-3" src="{{avatar}}" alt="avatar">
         <div class="media-body">
             <div class="d-flex justify-content-between flex-wrap">
