@@ -13,6 +13,8 @@ class Config:
     CHANNELS_LIMIT = 30
     MESSAGES_LIMIT = 50
     MEMBERS_LIMIT = 30
+    ASSETS_DEBUG = False
+    ASSETS_AUTO_BUILD = True
 
 
 class DevelopmentConfig(Config):
