@@ -24,7 +24,6 @@ $(function () {
         this.allLoaded = this.allLoaded || !list.length;
         this.loadedNumber += list.length;
       }
-      console.log(`load ${this.name}`, this.loadedNumber);
       const cb = list.length ? this.loadCallback : null;
       this.loadList(list, isReload, cb, ...args);
     }
@@ -46,7 +45,6 @@ $(function () {
         if (this.isContainerFull && !this.allLoaded &&
           entries[0].isIntersecting && this.scrollCallback) {
           this.scrollCallback();
-          // console.log(`emit ${this.name}`);
         }
       });
       intersectionObserver.observe(this.sentinel[0]);
@@ -65,7 +63,7 @@ $(function () {
 
     initialize () {
       this.socket.on('connect', () => this.onConnect());
-      this.socket.on('set initial info', data => this.onSetActiveChanel(data.channel, data.username));
+      this.socket.on('set initial information', data => this.onSetActiveChanel(data.channel, data.username));
       this.socket.on('load messages', data => this.messages.onLoad(data.messages,
                                                                    !this.messages.loadedNumber,
                                                                    data.fromSendMessage,
@@ -563,15 +561,15 @@ $(function () {
 
     toggleUploadFileName (html) {
       if (html === '') {
-          const parent = this.fileInfoField.parent();
-          parent.animate({ height: 0, opacity: 0 }, () => {
-            this.fileInfoField.html(html);
-            parent.height('auto').css('opacity', 1);
-          });
-        } else {
+        const parent = this.fileInfoField.parent();
+        parent.animate({ height: 0, opacity: 0 }, () => {
           this.fileInfoField.html(html);
-        }
-        this.scrollToChatBottom();
+          parent.height('auto').css('opacity', 1);
+        });
+      } else {
+        this.fileInfoField.html(html);
+      }
+      this.scrollToChatBottom();
     }
 
     onChangeUploadFileName () {
@@ -699,5 +697,5 @@ $(function () {
   }
 
   const view = new View();
-  const socket = new Socket(view);
+  new Socket(view);
 });

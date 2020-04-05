@@ -1,9 +1,9 @@
-from flask import current_app, render_template, redirect, url_for
+from flask import render_template, redirect, url_for
 from flask_login import login_required, current_user
 from flask_socketio import emit, join_room, leave_room
 
 from . import main
-from .socket_decorators import authenticated_only
+from .socket_decorator import authenticated_only
 from .. import db
 from ..models import Channel, Message, File
 from .forms import MessageForm, CreateChannelForm
@@ -30,8 +30,8 @@ def connect():
     db.session.add(current_user._get_current_object())
     db.session.commit()
     if current_user.channel_id is not None:
-        emit('set initial info', {'channel': current_user.current_channel.name,
-                                  'username': current_user.username})
+        emit('set initial information', {'channel': current_user.current_channel.name,
+                                         'username': current_user.username})
 
 
 @socketio.on('disconnect')
@@ -149,8 +149,6 @@ def toggle_channel_pin(channel_name, action_to_pin):
 @authenticated_only
 def get_messages(offset, from_scroll_event):
     messages = current_user.current_channel.get_all_channel_messages(offset=offset)
-    # print('get messages', len(messages))
-    # print('view offset', offset)
     emit('load messages',
          {'messages': messages, 'fromSendMessage': False, 'fromScrollEvent': from_scroll_event})
 
@@ -160,7 +158,6 @@ def get_messages(offset, from_scroll_event):
 def get_channels(offset):
     emit('load channels',
          {'channels': current_user.get_all_channels(offset=offset), 'isReload': False})
-    # print('get channels emit', current_user.username, offset)
 
 
 @socketio.on('get members')
