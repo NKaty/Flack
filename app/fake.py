@@ -104,9 +104,9 @@ def pin_channels(max_count=10):
     db.session.commit()
 
 
-def fake_data():
-    create_default_channel()
-    create_users()
+def fake_data(password):
+    create_default_channel(password=password)
+    create_users(password=password)
     create_channels()
     create_messages()
     pin_channels()
