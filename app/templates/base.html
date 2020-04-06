@@ -14,10 +14,11 @@
     <title>{% block title %}{% endblock %}Chat</title>
 </head>
 
-<body class="d-flex flex-column" style="background-image: url('{{ url_for('static', filename='images/bg-img.jpg') }}')">
+<body class="d-flex flex-column min-vh-100"
+      style="background-image: url('{{ url_for('static', filename='images/bg-img.jpg') }}'), linear-gradient(to right, #58a2e1, #e95ef9)">
     {% block nav %}{% endblock %}
 
-    <main class="flex-grow-1 pt-3">
+    <main class="flex-grow-1 pt-3 main-container">
         <div id="flash-messages" class="mx-3">
             {% for message in get_flashed_messages(True) %}
             <div class="alert alert-{{ message[0] }} alert-dismissible fade show" role="alert">
