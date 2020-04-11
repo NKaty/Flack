@@ -302,6 +302,7 @@ $(function () {
       this.handlebarsHelpers();
       this.initializeTooltips(this.tooltipSelector);
       this.setChatContainerHeight();
+      this.setMessagesAreaHeight();
       this.togglePane();
       this.onToggleChannelInfoPane();
       this.onCloseChannelInfoPane();
