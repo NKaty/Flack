@@ -117,8 +117,10 @@ def create_channel(data):
     form = CreateChannelForm(name=data['name'], description=data['description'])
     if not form.validate():
         emit('flash', form.get_form_error_messages())
+        return False
     elif Channel.query.filter_by(name=data['name']).first():
         emit('flash', [{'message': 'Channel with this name already exists.', 'category': 'danger'}])
+        return False
     else:
         new_channel = Channel(name=data['name'], description=data['description'],
                               creator_id=current_user.id)
@@ -127,8 +129,7 @@ def create_channel(data):
         emit('load channels',
              {'channels': current_user.get_all_channels(offset=0), 'isReload': True},
              broadcast=True)
-        emit('flash',
-             [{'message': 'Channel has been successfully created.', 'category': 'success'}])
+        return True
 
 
 @socketio.on('toggle channel pin')

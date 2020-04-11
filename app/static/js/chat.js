@@ -145,10 +145,7 @@ $(function () {
       this.view.channels.on('click', this.view.channelNameClass, function () {
         const newActiveChannel = self.view.setChannelActive(this);
         if (newActiveChannel) {
-          self.resetAtChannelChanged();
-          self.socket.emit('left', self.activeChannel);
-          self.activeChannel = newActiveChannel;
-          self.socket.emit('joined', self.activeChannel);
+          self.onChannelChangeEvent(newActiveChannel);
         }
       });
     }
@@ -156,6 +153,13 @@ $(function () {
     resetAtChannelChanged () {
       this.messages.loadedNumber = 0;
       this.messages.allLoaded = false;
+    }
+
+    onChannelChangeEvent (newActiveChannel) {
+      this.resetAtChannelChanged();
+      this.socket.emit('left', this.activeChannel);
+      this.activeChannel = newActiveChannel;
+      this.socket.emit('joined', this.activeChannel);
     }
 
     initializeToggleChannelPinEvent () {
@@ -215,6 +219,11 @@ $(function () {
           this.socket.emit('create channel', {
             name: channelName,
             description: channelDescription
+          }, isCreated => {
+            if (isCreated) {
+              this.view.setChannelActive(channelName);
+              this.onChannelChangeEvent(channelName);
+            }
           });
           this.view.createChannelModal.modal('hide');
         }
@@ -396,11 +405,20 @@ $(function () {
     }
 
     setChannelActive (channelName) {
-      const newActiveChannelItem = $(channelName).parent();
+      let newActiveChannelItem;
+      if (typeof channelName === 'string') {
+        newActiveChannelItem = this.channels.children(`li[data-channel=${channelName}]`);
+      } else {
+        newActiveChannelItem = $(channelName).parent();
+      }
       if (this.isChannelActive(newActiveChannelItem)) return;
       this.displaySpinner(this.messagesSpinner);
-      newActiveChannelItem.addClass('channel-active').siblings().removeClass('channel-active');
-      this.channelNameHeader.html(newActiveChannelItem.find(this.channelNameClass).html());
+      if (newActiveChannelItem.length) {
+        newActiveChannelItem.addClass('channel-active').siblings().removeClass('channel-active');
+      } else {
+        this.channels.find('.channel-active').removeClass('channel-active');
+      }
+      this.channelNameHeader.html(newActiveChannelItem.find(this.channelNameClass).html() || channelName);
       if (this.toggleChannelPaneButton.css('display') !== 'none') this.toggleChannelPaneButton.tab('show');
       return newActiveChannelItem.data('channel');
     }
