@@ -130,7 +130,6 @@ $(function () {
       if (this.isFirstConnect) {
         this.username = username;
         this.activeChannel = channel;
-        this.socket.emit('get messages', this.messages.loadedNumber, false);
         this.socket.emit('get channels', this.channels.loadedNumber);
         this.isFirstConnect = false;
       }
@@ -150,7 +149,6 @@ $(function () {
           self.socket.emit('left', self.activeChannel);
           self.activeChannel = newActiveChannel;
           self.socket.emit('joined', self.activeChannel);
-          self.socket.emit('get messages', self.messages.loadedNumber, false);
         }
       });
     }

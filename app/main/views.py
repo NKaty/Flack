@@ -71,6 +71,9 @@ def joined(channel):
     emit('load members',
          {'members': current_user.current_channel.get_all_channel_members(offset=0),
           'isReload': True}, room=current_user.current_channel.name)
+    emit('load messages',
+         {'messages': current_user.current_channel.get_all_channel_messages(offset=0),
+          'fromSendMessage': False, 'fromScrollEvent': False})
 
 
 @socketio.on('send message')
@@ -148,9 +151,9 @@ def toggle_channel_pin(channel_name, action_to_pin):
 @socketio.on('get messages')
 @authenticated_only
 def get_messages(offset, from_scroll_event):
-    messages = current_user.current_channel.get_all_channel_messages(offset=offset)
     emit('load messages',
-         {'messages': messages, 'fromSendMessage': False, 'fromScrollEvent': from_scroll_event})
+         {'messages': current_user.current_channel.get_all_channel_messages(offset=offset),
+          'fromSendMessage': False, 'fromScrollEvent': from_scroll_event})
 
 
 @socketio.on('get channels')
