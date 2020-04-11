@@ -222,7 +222,7 @@ textarea[name="message"] {
 }
 
 .upload-file-name:not(:empty)::before {
-    content: '\f15b  Selected file: ';
+    content: '\f15b \00a0 Selected file:\00a0';
     font-family: "Font Awesome 5 Pro", "Font Awesome 5 Free";
     font-weight: 400;
     font-style: normal;
