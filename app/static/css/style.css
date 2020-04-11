@@ -81,10 +81,6 @@ body {
     color: #fff;
 }
 
-.modal-dialog {
-    max-width: 400px;
-}
-
 .message {
     padding: 1em;
     width: 90%;
@@ -359,6 +355,11 @@ textarea:not([type="hidden"]) ~ .invalid-feedback {
         background: -moz-linear-gradient(to right, #ce57f6, #e95ef9);
         background: linear-gradient(to right, #ce57f6, #e95ef9);
     }
+
+    .modal-dialog {
+        max-width: 400px;
+    }
+
 }
 
 @keyframes fadeIn {
