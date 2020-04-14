@@ -182,6 +182,7 @@ $(function () {
               fileData.content = fileReader.result;
               this.socket.emit('send message', { message: message, file: fileData });
               this.view.resetSendMessageForm();
+              this.view.displaySpinner(this.view.newMessageSpinner);
             };
             fileReader.onerror = () => {
               this.view.showFormFieldErrorMessage(this.view.fileInfoGroup,
@@ -287,6 +288,7 @@ $(function () {
       this.navbar = $('#navbar');
       this.chatContainer = $('#chat-container');
       this.messagesSpinner = $('#messages-spinner');
+      this.newMessageSpinner = $('#new-message-spinner');
       this.channelsSentinel = $('#channels-sentinel');
       this.channelInfoSentinel = $('#channel-info-sentinel');
       this.messagesSentinel = $('#messages-sentinel');
@@ -635,6 +637,7 @@ $(function () {
       const template = Handlebars.compile(this.messagesTemplate.html());
       const html = template({ messages: messages, username: username, animated: fromSendMessage });
       if (fromSendMessage) {
+        if (!this.newMessageSpinner.hasClass('d-none')) this.newMessageSpinner.addClass('d-none');
         const isBottomScroll = this.checkBottomScroll();
         const prevScrollTop = this.messagesSection.scrollTop();
         this.messages.append(html);
