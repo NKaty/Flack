@@ -4,7 +4,7 @@
 
 Link to the course: https://www.edx.org/course/cs50s-web-programming-with-python-and-javascript
 
-Link to the app on Heroku: https://flack-channels.herokuapp.com/
+Link to the app on Heroku: https://flack-gnan.onrender.com
 
 #### Requirements:
 
@@ -24,4 +24,4 @@ Link to the app on Heroku: https://flack-channels.herokuapp.com/
 - Messages View: All the app data as well as the chat history is stored in the database (PostgreSQL). Channel messages are loaded in batches as the user scrolls the messages area. Scroll loading is also implemented for the list of channels. 
 - Sending Messages: Once in a channel, users can send text messages to others in the channel. A new message appears in the messages area of each user who is currently in the channel without reloading the page. Every displayed message has a timestamp (taking into account the time zone of the user for whom the message is displayed), the username and avatar of the author. The avatar is taken from Gravatar, the avatar service.
 - Remembering the Channel: The user's current channel is stored in the database, so whenever the user goes back to the app, they are taken back to their previous channel.
-- Personal Touch: Users can attach a file to their message. They also can see additional information about the selected channel such as a channel description, when and by whom the channel was created, a list of users, who are currently in the channel. A list of users is updated whenever users join or leave the channel. Scroll loading is also implemented for a list of users.
+- Personal Touch: Users can attach a file to their message, pin and unpin channels. They also can see additional information about the selected channel such as a channel description, when and by whom the channel was created, a list of users, who are currently in the channel. A list of users is updated whenever users join or leave the channel. Scroll loading is also implemented for a list of users.
