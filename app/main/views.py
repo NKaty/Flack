@@ -29,9 +29,10 @@ def connect():
     current_user.is_connected = True
     db.session.add(current_user._get_current_object())
     db.session.commit()
+    channel_name = None
     if current_user.channel_id is not None:
-        emit('set initial information', {'channel': current_user.current_channel.name,
-                                         'username': current_user.username})
+        channel_name = current_user.current_channel.name
+    emit('set initial information', {'channel': channel_name, 'username': current_user.username})
 
 
 @socketio.on('disconnect')
@@ -40,8 +41,9 @@ def disconnect():
     current_user.is_connected = False
     db.session.add(current_user._get_current_object())
     db.session.commit()
-    emit('load members', {'members': current_user.current_channel.get_all_channel_members(offset=0),
-                          'isReload': True}, room=current_user.current_channel.name)
+    if current_user.current_channel is not None:
+        emit('load members', {'members': current_user.current_channel.get_all_channel_members(offset=0),
+                              'isReload': True}, room=current_user.current_channel.name)
 
 
 @socketio.on('left')
@@ -152,8 +154,11 @@ def toggle_channel_pin(channel_name, action_to_pin):
 @socketio.on('get messages')
 @authenticated_only
 def get_messages(offset, from_scroll_event):
+    messages = list()
+    if current_user.current_channel:
+        messages = current_user.current_channel.get_all_channel_messages(offset=offset)
     emit('load messages',
-         {'messages': current_user.current_channel.get_all_channel_messages(offset=offset),
+         {'messages': messages,
           'fromSendMessage': False, 'fromScrollEvent': from_scroll_event})
 
 

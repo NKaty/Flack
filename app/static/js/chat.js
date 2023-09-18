@@ -133,7 +133,11 @@ $(function () {
         this.socket.emit('get channels', this.channels.loadedNumber);
         this.isFirstConnect = false;
       }
-      this.socket.emit('joined', this.activeChannel);
+      if (this.activeChannel) {
+        this.socket.emit('joined', this.activeChannel);
+      } else {
+        this.messages.onLoad([], true);
+      }
     }
 
     onLoadChannelInformation (info) {

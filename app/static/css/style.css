@@ -71,6 +71,7 @@ body {
     min-width: 240px;
     max-width: 330px;
     overflow: hidden;
+    color: #2f2248;
 }
 
 .channel-items-list .channel-name:hover {
@@ -97,6 +98,10 @@ body {
 
 .message-username {
     color: #6f42c1;
+}
+
+.channel-info-content {
+    color: #3c1880;
 }
 
 .channel-details:not(:empty) {

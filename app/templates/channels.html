@@ -40,7 +40,13 @@
                  data-toggle="tab" data-target="#channels-tab">
                 <i class="fas fa-arrow-left"></i>
             </div>
-            <h4 id="channel-name-header" class="text-truncate channel-name-header">{{ user.current_channel.name }}</h4>
+            <h4 id="channel-name-header" class="text-truncate channel-name-header">
+                {% if user.current_channel.name %}
+                    {{ user.current_channel.name }}
+                {% else %}
+                    No active channel
+                {% endif %}
+            </h4>
             <div class="d-block d-sm-none toggle-pane icon-button-arrow icon-button-absolute icon-button-right"
                  data-toggle="tab" data-target="#channel-info-tab">
                 <i class="fas fa-arrow-right"></i>
@@ -98,7 +104,7 @@
             </div>
         </div>
         <div class="text-center">
-            <div class="d-inline-block text-left">
+            <div class="d-inline-block text-left channel-info-content">
                 <div id="channel-details" class="mx-3 mb-3 channel-details"></div>
                 <h5 class="px-3 mb-3">Active members</h5>
                 <ul id="members" class="list-unstyled px-3"></ul>
