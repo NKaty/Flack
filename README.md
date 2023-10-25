@@ -4,7 +4,7 @@
 
 Link to the course: https://www.edx.org/course/cs50s-web-programming-with-python-and-javascript
 
-Link to the app on Heroku: https://flack-gnan.onrender.com
+Link to the app: https://flack-gnan.onrender.com
 
 #### Requirements:
 
